@@ -4,6 +4,8 @@ file(GLOB INCLUDE_FILES
     *.h
     database/*.h
     database/item/*.h
+    events/*.h
+    events/text_events/*.h
     player/*.h
     proton/*.h
     proton/utils/*.h
@@ -13,6 +15,8 @@ file(GLOB SOURCE_FILES
     *.cpp
     database/*.cpp
     database/item/*.cpp
+    events/*.cpp
+    events/text_events/*.cpp
     player/*.cpp
     proton/*.cpp
     proton/utils/*.cpp

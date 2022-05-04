@@ -2,6 +2,7 @@
 #include <fmt/core.h>
 #include <fmt/chrono.h>
 #include <fmt/ranges.h>
+#include <events/event_manager.h>
 #include <player/player.h>
 #include <proton/packet.h>
 #include <proton/utils/TextScanner.h>
@@ -15,6 +16,9 @@ namespace GTServer {
         if(!this->stop())
             return;
         delete m_host;
+    }
+    void ENetServer::set_event_manager(event_manager* ev) {
+        this->m_event_manager = ev;
     }
 
     std::pair<std::string, uint16_t> ENetServer::get_host() {
@@ -54,7 +58,6 @@ namespace GTServer {
                 case ENET_EVENT_TYPE_CONNECT: {
                     NetAvatar* player = new NetAvatar(m_event.peer, this);
                     player->send({ NET_MESSAGE_SERVER_HELLO }, sizeof(TankUpdatePacket));
-                    fmt::print("Connection IP: {}\n", player->m_ip_address.data());
                     break;
                 }
                 case ENET_EVENT_TYPE_DISCONNECT:
@@ -71,7 +74,18 @@ namespace GTServer {
                         case NET_MESSAGE_GENERIC_TEXT:
                         case NET_MESSAGE_GAME_MESSAGE: {
                             rt_parser text(utils::get_tank_update_data(m_event.packet));
-                            fmt::print("data: {}\n", text.get("requestedName", 1));
+                            if (!text.valid())
+                                break;
+                            std::string ev_function = text.get_all_raw().substr(0, text.get_all_raw().find('|'));
+                            event_manager::context ctx{ player, this };
+                            if (!m_event_manager->call(ev_function, ctx))
+                                break;
+                            break;
+                        }
+                        case NET_MESSAGE_GAME_PACKET: {
+                            GameUpdatePacket* update_packet = reinterpret_cast<GameUpdatePacket*>(tank_packet->data);
+                            if (!update_packet)
+                                break;
                             break;
                         }
                     }

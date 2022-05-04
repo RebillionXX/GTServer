@@ -3,6 +3,7 @@
 #include <string>
 #include <enet/enet.h>
 #include <proton/packet.h>
+#include <server/server.h>
 
 namespace GTServer {
     class NetAvatar {
@@ -18,7 +19,8 @@ namespace GTServer {
         }
         ~NetAvatar() = default;
 
-        [[nodiscard]] ENetPeer *get_peer() const { return m_peer; }
+        [[nodiscard]] ENetPeer* get_peer() const { return m_peer; }
+        [[nodiscard]] const char* get_ip_address() const { return m_ip_address.data(); }
 
         void send(TankUpdatePacket tank_packet, uintmax_t data_size)
         {

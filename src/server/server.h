@@ -8,10 +8,12 @@
 #include <enet/enet.h>
 
 namespace GTServer {
+    class event_manager;
     class ENetServer {
     public:
         ENetServer(const uint8_t& instanceId, const std::string& address, const uint16_t& port, const size_t& max_peers);
         ~ENetServer();
+        void set_event_manager(event_manager* ev);
         
         std::pair<std::string, uint16_t> get_host();
         bool start();
@@ -31,6 +33,8 @@ namespace GTServer {
         std::thread m_service;
 
         std::vector<ENetPeer*> m_peers{};
+    private:
+        event_manager* m_event_manager;
     };
 }
 

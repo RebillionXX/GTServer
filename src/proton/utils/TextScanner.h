@@ -36,6 +36,10 @@ public:
 		return tokens;
 	}
 
+	bool valid() {
+		return m_data.size() != 0;
+	}
+
 	std::string get(const std::string &key, int index, const std::string &token = "|", int key_index = 0) {
 		if (m_data.empty())
 			return std::string{};
@@ -50,6 +54,11 @@ public:
 			return tokenize[key_index + index];
 		}
 		return std::string{};
+	}
+	std::string get(const int& index) {
+		if(index < m_data.size() || index > m_data.size())
+			return std::string{};
+		return m_data[index];
 	}
 	template<typename T, typename std::enable_if_t<std::is_integral_v<T>, bool> = true>
 	T get(const std::string &key, int index, const std::string &token = "|") {

@@ -9,11 +9,13 @@
 
 #include <constants.h>
 #include <database/item/item_database.h>
+#include <events/event_manager.h>
 #include <server/server.h>
 #include <server/server_pool.h>
 
 using namespace GTServer;
 server_pool* g_servers;
+event_manager* g_events;
 std::vector<std::thread*> g_threads;
 httplib::Server g_http{};
 
@@ -31,6 +33,11 @@ int main() {
     fmt::print("initializing database\n"); {
         fmt::print(" - items.dat serialization -> {}\n", item_database::instance().init() ? "succeed" : "failed");
     } 
+    fmt::print("initializing events manager\n"); {
+        g_events = new event_manager();
+        g_events->load_events();
+        fmt::print(" - {} text events | {} game packet events\n", g_events->get_text_events(), g_events->get_packet_events());
+    }
 
     fmt::print("initializing threads\n");
     g_threads.push_back(new std::thread([&]() -> void {
@@ -40,7 +47,7 @@ int main() {
             req.body.find("platform") == std::string::npos ||
             req.body.find("protocol") == std::string::npos) {
                 res.set_content("my man, please stop reading my server_data.php", "text/html");
-                return false;
+                return true;
             }
             res.set_content(fmt::format(
                 "server|{}\n"
@@ -54,8 +61,8 @@ int main() {
             "text/html");
             return true;
         });
-        fmt::print("http server listening to 127.0.0.1:80, server -> {}:{}\n", constants::http::address.data(), constants::http::port);
-        g_http.listen("127.0.0.1", 80);
+        fmt::print("http server listening to 0.0.0.0:80, server -> {}:{}\n", constants::http::address.data(), constants::http::port);
+        g_http.listen("0.0.0.0", 80);
     }));
 
     fmt::print("initializing server pool\n");
@@ -69,6 +76,7 @@ int main() {
         fmt::print("failed to start enet server -> {}:{}", server->get_host().first, server->get_host().second);
         return EXIT_FAILURE;
     }
+    server->set_event_manager(g_events);
 
     for (const auto& thread : g_threads)
         thread->detach();
