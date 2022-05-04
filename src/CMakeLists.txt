@@ -2,9 +2,13 @@ project(server LANGUAGES CXX)
 
 file(GLOB INCLUDE_FILES
     *.h
+    player/*.h
+    proton/*.h
     server/*.h)
 file(GLOB SOURCE_FILES
     *.cpp
+    player/*.cpp
+    proton/*.cpp
     server/*.cpp)
 
 add_executable(${PROJECT_NAME}
