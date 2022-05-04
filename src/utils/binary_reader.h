@@ -23,7 +23,7 @@ namespace GTServer
         template<typename T, typename std::enable_if_t<std::is_integral_v<T>, bool> = true>
         T read() {
             T val;
-			memcpy(&val, this->m_data + this->m_pos, sizeof(T));
+			std::memcpy(&val, this->m_data + this->m_pos, sizeof(T));
 			this->m_pos += sizeof(T);
 			return val;
         }

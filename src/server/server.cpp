@@ -5,7 +5,7 @@
 #include <events/event_manager.h>
 #include <player/player.h>
 #include <proton/packet.h>
-#include <proton/utils/TextScanner.h>
+#include <proton/utils/text_scanner.h>
 #include <utils/packet.h>
 
 namespace GTServer {
@@ -73,7 +73,7 @@ namespace GTServer {
                     switch (tank_packet->type) {
                         case NET_MESSAGE_GENERIC_TEXT:
                         case NET_MESSAGE_GAME_MESSAGE: {
-                            rt_parser text(utils::get_tank_update_data(m_event.packet));
+                            text_scanner text(utils::get_tank_update_data(m_event.packet));
                             if (!text.valid())
                                 break;
                             std::string ev_function = text.get_all_raw().substr(0, text.get_all_raw().find('|'));
