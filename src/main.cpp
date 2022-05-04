@@ -8,9 +8,11 @@
 #include <httplib.h>
 
 #include <constants.h>
+#include <database/item/item_database.h>
 #include <server/server.h>
 #include <server/server_pool.h>
 
+using namespace GTServer;
 server_pool* g_servers;
 std::vector<std::thread*> g_threads;
 httplib::Server g_http{};
@@ -26,8 +28,12 @@ void exit_handler(int sig) {
 int main() {
     fmt::print("starting GTServer version 0.0.1\n");
     signal (SIGINT, exit_handler);
+    fmt::print("initializing database\n"); {
+        fmt::print(" - items.dat serialization -> {}\n", item_database::instance().init() ? "succeed" : "failed");
+    } 
+
     fmt::print("initializing threads\n");
-    g_threads.push_back(new std::thread([&]() {
+    g_threads.push_back(new std::thread([&]() -> void {
         g_http.Post("/growtopia/server_data.php", [&](const httplib::Request &req, httplib::Response &res) {
             if (req.body.empty() ||
             req.body.find("version") == std::string::npos ||
