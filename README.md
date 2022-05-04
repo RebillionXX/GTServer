@@ -2,6 +2,11 @@
 
 a server made for growtopia private server -> [Growtopia](https://growtopiagame.com/).
 
+## Features
+- [x] readable&clean code
+- [x] http service provider
+- [x] events manager
+
 ## How to build the source - starting path (GTServer/)
 ```shell
 $ mkdir build
