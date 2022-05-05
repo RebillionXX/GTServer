@@ -41,6 +41,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/cpp-httplib/
     ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/enet/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/fmt/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/mysql/include
