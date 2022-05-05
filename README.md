@@ -15,6 +15,11 @@ $ cmake ..
 $ cmake --build .
 ```
 
+## Running the program
+- if you're on windows, you've to move dynamic link library files from `GTServer/vendor/mysql/lib`
+- move all `.dll` files to `GTServer/build/src/Debug`
+- run the program.
+
 ## Credits
  - [yhirose - cpp-httplib](https://github.com/yhirose/cpp-httplib)
  - [lsalzman - enet](https://github.com/lsalzman/enet)

@@ -43,10 +43,15 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/enet/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/fmt/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/proton/shared
+    ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/mysql/include
 )
 
 target_link_libraries(${PROJECT_NAME} 
     enet
-    fmt
+    fmt  
+    ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/mysql/lib/libmysql.lib 
+    ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/mysql/lib/mysqlclient.lib 
+    ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/mysql/lib/mysqlcppconn.lib 
+    ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/mysql/lib/mysqlcppconn-static.lib 
+    ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/mysql/lib/mysqlservices.lib
 )

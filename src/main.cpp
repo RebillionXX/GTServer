@@ -8,12 +8,14 @@
 #include <httplib.h>
 
 #include <constants.h>
+#include <database/database.h>
 #include <database/item/item_database.h>
 #include <events/event_manager.h>
 #include <server/server.h>
 #include <server/server_pool.h>
 
 using namespace GTServer;
+database* g_database;
 server_pool* g_servers;
 event_manager* g_events;
 std::vector<std::thread*> g_threads;
@@ -31,6 +33,8 @@ int main() {
     fmt::print("starting GTServer version 0.0.1\n");
     signal (SIGINT, exit_handler);
     fmt::print("initializing database\n"); {
+        g_database = new database();
+        fmt::print(" - {} mysql server {}@{} -> {}\n", g_database->init() ? "connected to" : "failed to connect", constants::mysql::host, constants::mysql::username, constants::mysql::schema);
         fmt::print(" - items.dat serialization -> {}\n", item_database::instance().init() ? "succeed" : "failed");
     } 
     fmt::print("initializing events manager\n"); {
