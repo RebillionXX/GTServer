@@ -71,7 +71,9 @@ namespace GTServer {
             update_packet->flags |= NET_GAME_PACKET_FLAGS_EXTENDED;
             update_packet->data_size = alloc;
             std::memcpy(static_cast<uint8_t*>(&update_packet->data), var_data, alloc);
+
             this->send(tank_packet, sizeof(TankUpdatePacket) + sizeof(GameUpdatePacket) + update_packet->data_size);
+            free(tank_packet);
         }
     public:
         std::string m_ip_address;
