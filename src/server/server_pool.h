@@ -29,11 +29,19 @@ namespace GTServer {
             fmt::print("failed to shutdown instanceId: {}\n", instanceId);
             return;
         }
+
+        void set_user_id(const int& uid) {
+            user_id = uid;
+        }
+        [[nodiscard]] int get_user_id(bool increase = true) {
+            return increase ? ++user_id : user_id;
+        }
     private:
         std::string m_address{ "0.0.0.0" };
         uint16_t m_port{ 17091 };
         size_t m_max_peers{ 0xFF };
 
+        int user_id{ 0 };
         std::unordered_map<uint8_t, ENetServer*> m_servers{};
     };
 }

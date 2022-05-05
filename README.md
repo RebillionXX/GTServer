@@ -16,8 +16,7 @@ $ cmake --build .
 ```
 
 ## Running the program
-- if you're on windows, you've to move dynamic link library files from `GTServer/vendor/mysql/lib`
-- move all `.dll` files to `GTServer/build/src/Debug`
+- copy a executable file (`server.exe`) from `GTServer/build/src/debug` to `GTServer/bin`
 - run the program.
 
 ## Credits
