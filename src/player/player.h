@@ -23,6 +23,8 @@ namespace GTServer {
         ~NetAvatar() = default;
 
         [[nodiscard]] ENetPeer* get_peer() const { return m_peer; }
+        [[nodiscard]] int get_net() const { return m_net; }
+
         [[nodiscard]] const char* get_ip_address() const { return m_ip_address.data(); }
 
         void send(TankUpdatePacket tank_packet, uintmax_t data_size) {
@@ -77,7 +79,12 @@ namespace GTServer {
         }
     public:
         std::string m_ip_address;
+        
+        std::string m_tank_id_name;
+        std::string m_tank_id_pass;
     private:
+
+        int m_net;
         ENetPeer* m_peer;
         ENetServer* m_server;
     };
