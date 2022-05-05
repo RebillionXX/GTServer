@@ -16,13 +16,13 @@ namespace GTServer {
             const std::string& schema = "gtserver";
         };
         namespace cdn {
-            constexpr std::basic_string url = "ubistatic-a.akamihd.net";
-            constexpr std::basic_string cache = "0098/XXXX/cache/";
+            constexpr std::string_view url = "ubistatic-a.akamihd.net";
+            constexpr std::string_view cache = "0098/15786/cache/";
         }
         namespace svr {
-            constexpr std::string_view name = "Buildo";
+            constexpr std::string_view name = "Buildo/GTserver";
             constexpr std::string_view discord = "https://discord.gg/wHVSrHKbYH";
-            constexpr std::_String_val version = "0.0.1";
+            constexpr std::string_view version = "0.0.1";
         }
     };
 }
