@@ -58,7 +58,6 @@ namespace GTServer {
                 case ENET_EVENT_TYPE_CONNECT: {
                     NetAvatar* player = new NetAvatar(m_event.peer, this);
                     player->send({ NET_MESSAGE_SERVER_HELLO }, sizeof(TankUpdatePacket));
-                    player->send_variant({ "OnConsoleMessage", fmt::format("Welcome to `w{}``!", "Buildo/GTserver")});
                     break;
                 }
                 case ENET_EVENT_TYPE_DISCONNECT:
@@ -74,11 +73,14 @@ namespace GTServer {
                     switch (tank_packet->type) {
                         case NET_MESSAGE_GENERIC_TEXT:
                         case NET_MESSAGE_GAME_MESSAGE: {
-                            text_scanner text(utils::get_tank_update_data(m_event.packet));
-                            if (!text.valid())
-                                break;
-                            std::string ev_function = text.get_all_raw().substr(0, text.get_all_raw().find('|'));
-                            event_manager::context ctx{ player, this };
+                            const auto& str = utils::get_tank_update_data(m_event.packet);
+                            text_scanner text;
+                            if (!text.parse(str) || text.get_data().size() == 0) {
+                                player->disconnect(0U);
+                                return;
+                            }
+                            std::string ev_function = str.substr(0, str.find('|'));
+                            event_manager::context ctx{ player, this, &text };
                             if (!m_event_manager->call(ev_function, ctx))
                                 break;
                             break;

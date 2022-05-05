@@ -1,99 +1,86 @@
-//  ***************************************************************
-//  TextScanner - Creation date: 06/09/2009
-//  -------------------------------------------------------------
-//  Robinson Technologies Copyright (C) 2009 - All Rights Reserved
-//
-//  ***************************************************************
-//  Programmer(s):  Seth A. Robinson (seth@rtsoft.com)
-//  ***************************************************************
-
 #ifndef PROTON_UTILS__TEXT_SCANNER_H
 #define PROTON_UTILS__TEXT_SCANNER_H
-#include <algorithm>
+
 #include <string>
-#include <vector>
+#include <unordered_map>
+#include <fmt/core.h>
 
-class text_scanner
+namespace GTServer
 {
-public:
-	text_scanner(const std::string &data) {
-		m_data = this->tokenize_line(data, "\n");
-		for (auto &s : m_data)
-			std::replace(s.begin(), s.end(), '\t', '\0');
-	}
-	~text_scanner() = default;
+    class text_scanner
+    {
+    public:
+        text_scanner() = default;
+		~text_scanner() = default;
 
-	std::vector<std::string> tokenize_line(const std::string &string, const std::string &delimiter = "|") {
-		std::vector<std::string> tokens;
-		std::size_t last_pos = string.find_first_not_of(delimiter, 0);
-		std::size_t pos = string.find_first_of(delimiter, last_pos);
+        bool parse(const std::string& data) {
+			try {
+				std::string::size_type key_pos = 0;
+				std::string::size_type i = 0;
+				std::string key, val;
 
-		while (pos != std::string::npos || last_pos != std::string::npos) {
-			tokens.push_back(string.substr(last_pos, pos - last_pos));
-			last_pos = string.find_first_not_of(delimiter, pos);
-			pos = string.find_first_of(delimiter, last_pos);
+				while (i != std::string::npos) {
+					if (i + 2 >= data.size()) 
+						break;
+					key_pos = data.find('|', i + 2);
+					if (key_pos == std::string::npos)
+						break;
+					key = data.substr((i == 0 || i == 1 ? i : i + 1), key_pos - i - (i == 0 || i == 1 ? 0 : 1));
+					if (i + 1 >= data.size()) break;
+
+					i = data.find('\n', i + 1);
+					if (i == std::string::npos)
+						val = data.substr(key_pos + 1);
+					else
+						val = data.substr(key_pos + 1, i - key_pos - 1);
+					m_data.insert_or_assign(std::move(key), std::move(val));
+				}
+				return true;
+			}
+			catch (std::exception e) {
+				return false;
+			}
+			catch (...) {
+				return false;
+			}
 		}
-		return tokens;
-	}
 
-	bool valid() {
-		return m_data.size() != 0;
-	}
-
-	std::string get(const std::string &key, int index, const std::string &token = "|", int key_index = 0) {
-		if (m_data.empty())
-			return std::string{};
-		for (auto &data : m_data) {
-			if (data.empty())
-				continue;
-			const auto& tokenize = this->tokenize_line(data, token);
-			if (tokenize[key_index] != key)
-				continue;
-			if (index < 0 || index >= tokenize.size())
-				return std::string{};
-			return tokenize[key_index + index];
+		bool contain(const std::string& key) {
+			return m_data.find(key) != m_data.end();
 		}
-		return std::string{};
-	}
-	std::string get(const int& index) {
-		if(index < m_data.size() || index > m_data.size())
-			return std::string{};
-		return m_data[index];
-	}
-	template<typename T, typename std::enable_if_t<std::is_integral_v<T>, bool> = true>
-	T get(const std::string &key, int index, const std::string &token = "|") {
-		return std::atoi(this->get(key, index, token));
-	}
-	template<typename T, typename std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	T get(const std::string &key, int index, const std::string &token = "|") {
-		if (std::is_same_v<T, double>)
-			return std::stod(this->get(key, index, token));
-		else if (std::is_same_v<T, long double>)
-			return std::stold(this->get(key, index, token));
-		return std::stof(this->get(key, index, token));
-	}
-
-	std::string get_all_raw() {
-		std::string ret{};
-		for (auto index = 0; index < m_data.size(); index++) {
-			ret.append(m_data[index]);
-			if (index + 1 >= m_data.size())
-				continue;
-			if (!m_data[index + 1].empty())
-				ret.append("\n");
+        const std::string& get(const std::string& key) {
+			if (this->contain(key))
+            	return m_data[key];
+        	return std::string{};
 		}
-		return ret;
-	}
+        const std::unordered_map<std::string, std::string>& get_data() {
+			return m_data;
+		}
 
-	bool empty() {
-		return m_data.empty();
-	}
-	int get_line_count() {
-		return (int)m_data.size();
-	}
-private:
-	std::vector<std::string> m_data;
-};
-
+		bool try_get(const std::string& key, std::string& value) noexcept {
+			auto it = m_data.find(key);
+			if (it == m_data.end())
+				return false;
+			value = it->second;
+			return true;
+		}
+		bool try_get(const std::string& key, int& value) noexcept {
+			auto it = m_data.find(key);
+			if (it == m_data.end())
+				return false;
+			value = std::atoi(it->second.c_str());
+			return true;
+		}
+		bool try_get(const std::string& key, bool& value) noexcept {
+			auto it = m_data.find(key);
+			if (it == m_data.end())
+				return false;
+			value = it->second == "1";
+			return true;
+		}
+    private:
+        std::unordered_map<std::string, std::string> m_data;
+    };
+}
 
 #endif // PROTON_UTILS__TEXT_SCANNER_H

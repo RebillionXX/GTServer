@@ -13,7 +13,6 @@ namespace GTServer
         mysql_result(sql::ResultSet* result) : m_result(result) {}
         ~mysql_result() {
             delete m_result;
-            fmt::print("clearing memory leak\n");
         }
 
         const bool get_bool(const uint32_t& colum_index) {

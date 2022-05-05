@@ -7,11 +7,24 @@
 #include <proton/packet.h>
 #include <proton/variant.h>
 #include <server/server.h>
-#include <constants.h>
 #include <database/item/item_database.h>
 
 namespace GTServer {
     class NetAvatar {
+    public:
+        enum : int32_t {
+            PLATFORM_ID_UNKNOWN = -1,
+            PLATFORM_ID_WINDOWS,
+            PLATFORM_ID_IOS,
+            PLATFORM_ID_OSX,
+            PLATFORM_ID_LINUX,
+            PLATFORM_ID_ANDROID,
+            PLATFORM_ID_WINDOWS_MOBILE,
+            PLATFORM_ID_WEBOS,
+            PLATFORM_ID_BBX,
+            PLATFORM_ID_FLASH,
+            PLATFORM_ID_HTML5
+        };
     public:
         NetAvatar(ENetPeer* peer, ENetServer* server) 
         : m_peer(peer), m_server(server) {
@@ -25,9 +38,11 @@ namespace GTServer {
         ~NetAvatar() = default;
 
         [[nodiscard]] ENetPeer* get_peer() const { return m_peer; }
-        [[nodiscard]] int get_net() const { return m_net; }
-
         [[nodiscard]] const char* get_ip_address() const { return m_ip_address.data(); }
+
+        void disconnect(const enet_uint32& data) {
+            enet_peer_disconnect_later(this->get_peer(), data);
+        }
 
         void send(TankUpdatePacket tank_packet, uintmax_t data_size) {
             if (!this->get_peer())
@@ -57,6 +72,16 @@ namespace GTServer {
             if (enet_peer_send(m_peer, 0, packet) != 0)
                 enet_packet_destroy(packet);
         }
+        void send_text(const std::string& packet) {
+            TankUpdatePacket* tank_packet = (TankUpdatePacket*)std::malloc(sizeof(TankUpdatePacket) + packet.size());
+            tank_packet->type = NET_MESSAGE_GAME_MESSAGE;
+            tank_packet->data = (char*)std::malloc(packet.size());
+            std::memcpy(reinterpret_cast<uint8_t*>(&tank_packet->data), packet.data(), packet.size());
+            reinterpret_cast<uint8_t*>(&tank_packet->data)[packet.size()] = 0;
+
+            this->send(tank_packet, sizeof(TankUpdatePacket) + packet.size());
+            std::free(tank_packet);
+        }
         void send_var(const variantlist_t& var, int32_t delay = 0, int32_t net_id = -1) {
             size_t alloc = 1;
             for(const auto& v : var.get_objects())
@@ -77,28 +102,18 @@ namespace GTServer {
             std::memcpy(static_cast<uint8_t*>(&update_packet->data), var_data, alloc);
 
             this->send(tank_packet, sizeof(TankUpdatePacket) + sizeof(GameUpdatePacket) + update_packet->data_size);
-            free(tank_packet);
+            std::free(tank_packet);
         }
-        void send_log(std::string arg) {
-            this->send_var({ "OnConsoleMessage", arg });
-        }
-        void send_logon_attempt() {
-            this->send_var({ "OnSuperMainStartAcceptLogonHrdxs47254722215a",
-                0,
-                std::string(constants::cdn::url),
-                std::string(constants::cdn::cache),
-                "cc.cz.madkite.freedom org.aqua.gg idv.aqua.bulldog com.cih.gamecih2 com.cih.gamecih com.cih.game_cih cn.maocai.gamekiller com.gmd.speedtime org.dax.attack com.x0.strai.frep com.x0.strai.free org.cheatengine.cegui org.sbtools.gamehack com.skgames.traffikrider org.sbtoods.gamehaca com.skype.ralder org.cheatengine.cegui.xx.multi1458919170111 com.prohiro.macro me.autotouch.autotouch com.cygery.repetitouch.free com.cygery.repetitouch.pro com.proziro.zacro com.slash.gamebuster",
-                "proto=161|choosemusic=audio/mp3/cumbia.mp3|active_holiday=5|wing_week_day=0|ubi_week_day=0|server_tick=735463|clash_active=0|drop_lavacheck_faster=1|isPayingUser=1|usingStoreNavigation=1|enableInventoryTab=1|bigBackpack=1|",
-                2357275721 });
+        void send_log(const std::string& msg) {
+            this->send_text(fmt::format("action|log\nmsg|{}", msg));
         }
     public:
+        int32_t m_platform = PLATFORM_ID_UNKNOWN;
+        void* m_login_info;
+
         std::string m_ip_address;
-        
-        std::string m_tank_id_name;
-        std::string m_tank_id_pass;
     private:
 
-        int m_net;
         ENetPeer* m_peer;
         ENetServer* m_server;
     };
