@@ -9,6 +9,10 @@ a server made for growtopia private server -> [Growtopia](https://growtopiagame.
 - [x] variantlist & gameupdatepackets handler
 - [x] MySQL connection
 
+## Requirement
+To building this source, you would need to install these libraries:
+- [Boost](https://www.boost.org/)
+
 ## How to build the source - starting path (GTServer/)
 ```shell
 $ mkdir build

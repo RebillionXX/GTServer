@@ -1,6 +1,7 @@
 #include <events/event_manager.h>
 #include <fmt/core.h>
 #include <utils/text.h>
+#include <events/text_events/action.h>
 #include <events/text_events/requested_name.h>
 
 namespace GTServer {
@@ -15,6 +16,7 @@ namespace GTServer {
 
     void event_manager::load_events() {
         this->register_event("requestedName", events::requested_name);
+        this->register_event("action", events::action);
     }
 
     void event_manager::register_event(const std::string& data, std::function<void(event_manager::context&)> fn) {

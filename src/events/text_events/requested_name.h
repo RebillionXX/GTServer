@@ -36,11 +36,22 @@ namespace GTServer::events {
         using namespace proton::utils;
         dialog_builder db{};
         db.set_default_color('o')
-            ->add_label_with_icon("`wGTServer V0.0.1``", 18, dialog_builder::LEFT, dialog_builder::BIG)
+            ->add_label_with_icon("`wGTServer V0.0.1``", 0, dialog_builder::LEFT, dialog_builder::BIG)
             ->add_spacer()
-            ->add_textbox("TEST TEST TEST")
+            ->add_textbox("By choosing a `wGrowID``, you can use a name and password to logon from any devide. Your`` name`` will be shown to other players!")
+            ->add_text_input("name", "GrowID:", "", 18)
             ->add_spacer()
-            ->end_dialog("test", "Cancel", "OK");
+            ->add_textbox("Your `wpassword`` must contain`` 8 to 18 characters, 1 letter, 1 number`` and`` 1 special character: @#!$^&*.,``")
+            ->add_text_input_password("password", "Password:", "", 18)
+            ->add_text_input_password("verify_password", "Verify Password:", "", 18)
+            ->add_spacer()
+            ->add_textbox("Your `wemail address `owill only be used for account verification purposes and won't be spammed or shared. If you use a fake email, you'll never be able to recover or change your password.")
+            ->add_text_input("email", "Email:", "", 25)
+            ->add_textbox("Your `wDiscord ID `owill be used for secondary verification if you lost access to your `wemail address`o! Please enter in such format: `wdiscordname#tag`o. Your `wDiscord Tag `ocan be found in your `wDiscord account settings`o.")
+            ->add_text_input("discord", "Discord:", "", 25)
+            ->add_textbox("We will never ask you for your password, email or discord, never share it with anyone!")
+            ->add_spacer()
+            ->end_dialog("growid", "Disconnect", "Create!");
         ctx.m_local->send_var({ "OnDialogRequest", db.get() });
     }
 }

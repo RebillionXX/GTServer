@@ -1,5 +1,6 @@
 #ifndef PLAYER__PLAYER_H
 #define PLAYER__PLAYER_H
+#include <atomic>
 #include <string>
 #include <enet/enet.h>
 #include <fmt/core.h>
@@ -111,11 +112,12 @@ namespace GTServer {
         int32_t m_platform = PLATFORM_ID_UNKNOWN;
         void* m_login_info;
 
-        std::string m_ip_address;
+        std::atomic<bool> m_logged_on;
     private:
-
         ENetPeer* m_peer;
         ENetServer* m_server;
+
+        std::string m_ip_address;
     };
 }
 

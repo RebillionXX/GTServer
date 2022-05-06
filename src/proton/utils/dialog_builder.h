@@ -84,7 +84,14 @@ namespace GTServer::proton::utils
         	return this;
 		}
 		dialog_builder* add_smalltext(const std::string& label);
-		dialog_builder* add_text_input(const std::string& name, const std::string& label, const std::string& label_inside, const int& max_length);
+		dialog_builder* add_text_input(const std::string& name, const std::string& label, const std::string& label_inside, const int& max_length) {
+			m_result.append(fmt::format("\nadd_text_input|{}|{}|{}|{}|", name, label, label_inside, max_length));
+        	return this;
+		}
+		dialog_builder* add_text_input_password(const std::string& name, const std::string& label, const std::string& label_inside, const int& max_length) {
+			m_result.append(fmt::format("\nadd_text_input_password|{}|{}|{}|{}|", name, label, label_inside, max_length));
+        	return this;
+		}
 		dialog_builder* add_text_box_input(const std::string& name, const std::string& label, std::string text_inside, const int& max_length, const int& lines);
 		dialog_builder* add_button(const std::string& name, const std::string& label, const std::string& btn_flag = "noflags");
 		dialog_builder* add_button_with_icon(const std::string& name, const std::string& label, const int& item_id, const int& start_direction = LEFT);
