@@ -5,8 +5,7 @@ a server made for growtopia private server -> [Growtopia](https://growtopiagame.
 ## Features
 - [x] readable&clean code
 - [x] http service provider
-- [x] events manager
-- [x] variantlist & gameupdatepackets handler
+- [x] proper events manager
 - [x] MySQL connection
 
 ## Requirement
