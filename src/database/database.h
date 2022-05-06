@@ -23,6 +23,7 @@ namespace GTServer {
                 m_connection->setSchema(mysql::schema.c_str());
                 return true;
             } catch (const sql::SQLException& e) {
+                fmt::print("SQL driver instance error: {}.\n", e.what());
                 return false;
             }
         }

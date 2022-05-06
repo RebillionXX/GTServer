@@ -52,15 +52,32 @@ namespace GTServer {
     }
     void ENetServer::service() {
         while (m_running.load()) {
-            if (enet_host_service(m_host, &m_event, 1000) < 1)
+            if (enet_host_service(m_host, &m_event, 1000) < 0x1)
                 continue;
             switch(m_event.type) {
                 case ENET_EVENT_TYPE_CONNECT: {
                     NetAvatar* player = new NetAvatar(m_event.peer, this);
-                    player->send({ NET_MESSAGE_SERVER_HELLO }, sizeof(TankUpdatePacket));
+                    uint16_t login_attempts = 0; //TODO: part 1 of bot protection ~ Stormzy
+                    //for (auto& logged : m_host->get_players()) {
+                        //if (logged->get_peer()->address.host == m_event.peer->address.host)
+                            //login_attempts++;
+                    //}
+                    if (login_attempts > 0x3) { //Rebillion, don't delete that. i will use it soon :C
+                        player->send_log("`6>> Private-msg from `4@System``: Server pervented your client from logging into the server due to spam.``");
+                        player->disconnect(0U);
+                        return;
+                    }
+                    else
+                        player->send({ NET_MESSAGE_SERVER_HELLO }, sizeof(TankUpdatePacket));
                     break;
                 }
                 case ENET_EVENT_TYPE_DISCONNECT:
+                    if (m_event.peer->data != nullptr)
+                    {
+                        NetAvatar* local_p = static_cast<NetAvatar*>(m_event.peer->data);
+                        //TODO
+                        delete local_p;
+                    }
                     break;
                 case ENET_EVENT_TYPE_RECEIVE: {
                     if(!m_event.peer || !m_event.peer->data)
@@ -75,7 +92,7 @@ namespace GTServer {
                         case NET_MESSAGE_GAME_MESSAGE: {
                             const auto& str = utils::get_tank_update_data(m_event.packet);
                             text_scanner text;
-                            if (!text.parse(str) || text.get_data().size() == 0) {
+                            if (!text.parse(str) || text.get_data().size() == 0x0) {
                                 player->disconnect(0U);
                                 return;
                             }
@@ -87,10 +104,10 @@ namespace GTServer {
                         }
                         case NET_MESSAGE_GAME_PACKET: {
                             GameUpdatePacket* update_packet = reinterpret_cast<GameUpdatePacket*>(tank_packet->data);
-                            if (!update_packet) {
-                                fmt::print("Failed to send game-packet with type: {}.\n", update_packet->type);
-                                return;
-                            }
+                            if (!update_packet)
+                            return;
+                            if (m_event.packet->dataLength < 0x38) 
+                               return;
                             break;
                         }
                     }

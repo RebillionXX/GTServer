@@ -82,7 +82,7 @@ int main() {
                 return true;
             });
             fmt::print(" - HTTP server listening to: 0.0.0.0:80, server -> {}:{}\n", constants::http::address.data(), constants::http::port);
-            g_http.listen("0.0.0.0", 80);
+            g_http.listen("0.0.0.0", constants::http::http_port);
         }));
     }
 
