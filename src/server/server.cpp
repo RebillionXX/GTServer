@@ -80,8 +80,8 @@ namespace GTServer {
                                 return;
                             }
                             std::string ev_function = str.substr(0, str.find('|'));
-                            event_manager::context ctx{ player, this, &text };
-                            if (!m_event_manager->call(ev_function, ctx))
+                            event_manager::context ctx{ player, this, m_event_manager, &text };
+                            if (!m_event_manager->call({ ev_function, event_manager::text_event::TEXT }, ctx))
                                 break;
                             break;
                         }

@@ -49,7 +49,7 @@ int main() {
     fmt::print("initializing events manager\n"); {
         g_events = new event_manager();
         g_events->load_events();
-        fmt::print(" - {} text events | {} game packet events\n", g_events->get_text_events(), g_events->get_packet_events());
+        fmt::print(" - {} text events | {} action events | {} game packet events\n", g_events->get_text_events(), g_events->get_action_events(), g_events->get_packet_events());
     }
 
     fmt::print("initializing threads\n"); {

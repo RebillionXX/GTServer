@@ -63,25 +63,25 @@ namespace GTServer {
             if (!packet || !update_packet)
                 return;
             std::memcpy(packet->data, &tank_packet->type, 4);
-            //DEBUG
-            std::vector<char> array;
-            for(auto i = 0; i < update_packet->data_size; i++)
-                array.push_back(static_cast<char>(reinterpret_cast<uint8_t*>(&update_packet->data)[i]));
-            fmt::print("array: {}\n", array);
             std::memcpy(packet->data + 4, update_packet, sizeof(GameUpdatePacket) + update_packet->data_size);
 
             if (enet_peer_send(m_peer, 0, packet) != 0)
                 enet_packet_destroy(packet);
-        }
-        void send_text(const std::string& packet) {
-            TankUpdatePacket* tank_packet = (TankUpdatePacket*)std::malloc(sizeof(TankUpdatePacket) + packet.size());
-            tank_packet->type = NET_MESSAGE_GAME_MESSAGE;
-            tank_packet->data = (char*)std::malloc(packet.size());
-            std::memcpy(reinterpret_cast<uint8_t*>(&tank_packet->data), packet.data(), packet.size());
-            reinterpret_cast<uint8_t*>(&tank_packet->data)[packet.size()] = 0;
+        }    
+        void send(int32_t type, const void* data, uintmax_t data_size) {
+            if (!this->get_peer())
+                return;
+            ENetPacket* packet = enet_packet_create(nullptr, 5 + data_size, ENET_PACKET_FLAG_RELIABLE);
+            if (!packet)
+                return;
+            std::memcpy(packet->data, &type, 4);
+            packet->data[data_size + 4] = 0;
+            
+            if (data)
+                std::memcpy(packet->data + 4, data, data_size);
 
-            this->send(tank_packet, sizeof(TankUpdatePacket) + packet.size());
-            std::free(tank_packet);
+            if (enet_peer_send(m_peer, 0, packet) != 0)
+                enet_packet_destroy(packet);
         }
         void send_var(const variantlist_t& var, int32_t delay = 0, int32_t net_id = -1) {
             size_t alloc = 1;
@@ -106,7 +106,8 @@ namespace GTServer {
             std::free(tank_packet);
         }
         void send_log(const std::string& msg) {
-            this->send_text(fmt::format("action|log\nmsg|{}", msg));
+            const auto& data = fmt::format("action|log\nmsg|{}", msg);
+            this->send(NET_MESSAGE_GAME_MESSAGE, data.data(), data.size());
         }
     public:
         int32_t m_platform = PLATFORM_ID_UNKNOWN;

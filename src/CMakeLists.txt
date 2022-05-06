@@ -6,6 +6,7 @@ file(GLOB INCLUDE_FILES
     database/item/*.h
     events/*.h
     events/text_events/*.h
+    events/text_events/action/*.h
     player/*.h
     proton/*.h
     proton/utils/*.h
@@ -17,6 +18,7 @@ file(GLOB SOURCE_FILES
     database/item/*.cpp
     events/*.cpp
     events/text_events/*.cpp
+    events/text_events/action/*.cpp
     player/*.cpp
     proton/*.cpp
     proton/utils/*.cpp
