@@ -15,6 +15,8 @@ namespace GTServer
         static item_database& instance() { static item_database items; return items; }
 
         static bool init() { return instance().interface__init(); }
+
+        [[nodiscard]] uint32_t get_hash() const { return m_hash; }
     private:
         item_database() = default;
         ~item_database();

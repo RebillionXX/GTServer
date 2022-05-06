@@ -1,8 +1,10 @@
 #include <database/item/item_database.h>
+#include <database/item/item_components.h>
 #include <filesystem>
 #include <fstream>
 #include <fmt/core.h>
 #include <utils/binary_reader.h>
+#include <utils/text.h>
 
 namespace GTServer {
     item_database::~item_database() {
@@ -21,6 +23,8 @@ namespace GTServer {
             return false;
         file.read(m_data, data_size);
         file.close();
+
+        m_hash = utils::text::hash_data(m_data, data_size);
 
         binary_reader br(reinterpret_cast<uint8_t*>(m_data));
         m_version = br.read<uint16_t>();
@@ -86,7 +90,7 @@ namespace GTServer {
             item.m_val5 = br.read<uint32_t>();
 
             if (i != item.m_id)
-                fmt::print("items are unordered: {}/{}\n", i, item.m_id);
+                fmt::print("Detected unordered items: {}/{}.\n", i, item.m_id);
             m_items.push_back(std::move(item));
         }
 

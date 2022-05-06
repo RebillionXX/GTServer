@@ -35,7 +35,7 @@ namespace GTServer {
         
         m_host->checksum = enet_crc32;
         enet_host_compress_with_range_coder(m_host);
-        fmt::print("starting instanceId: {}, {}:{} - {}\n", 1, m_address, m_port, std::chrono::system_clock::now());
+        fmt::print("Starting InstanceID: {}, {}:{} - {}\n", 1, m_address, m_port, std::chrono::system_clock::now());
         m_running.store(true);
         return true;
     }
@@ -61,7 +61,7 @@ namespace GTServer {
                     break;
                 }
                 case ENET_EVENT_TYPE_DISCONNECT:
-                    break; //todo
+                    break;
                 case ENET_EVENT_TYPE_RECEIVE: {
                     if(!m_event.peer || !m_event.peer->data)
                         return;
@@ -80,15 +80,17 @@ namespace GTServer {
                                 return;
                             }
                             std::string ev_function = str.substr(0, str.find('|'));
-                            event_manager::context ctx{ player, this, m_event_manager, &text };
-                            if (!m_event_manager->call({ ev_function, event_manager::text_event::TEXT }, ctx))
+                            event_manager::context ctx{ player, this, &text };
+                            if (!m_event_manager->call(ev_function, ctx))
                                 break;
                             break;
                         }
                         case NET_MESSAGE_GAME_PACKET: {
                             GameUpdatePacket* update_packet = reinterpret_cast<GameUpdatePacket*>(tank_packet->data);
-                            if (!update_packet)
-                                break;
+                            if (!update_packet) {
+                                fmt::print("Failed to send game-packet with type: {}.\n", update_packet->type);
+                                return;
+                            }
                             break;
                         }
                     }

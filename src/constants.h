@@ -15,6 +15,10 @@ namespace GTServer {
             const std::string& password = "";
             const std::string& schema = "gtserver";
         };
+        namespace settings {
+            const std::string& svr_name = "GTserver";
+            const std::string& svr_discord = "https://discord.gg/wHVSrHKbYH";
+        }
     };
 }
 

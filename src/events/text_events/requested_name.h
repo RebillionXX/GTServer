@@ -49,6 +49,6 @@ namespace GTServer::events {
             ->add_text_input("email", "Email ", "", 30)
             ->add_spacer()
             ->end_dialog("growid_apply", "`wCancel``", "`wGet a GrowID!``");
-        ctx.m_local->send_var({ "OnDialogRequest", db.get() });
+        ctx.m_local->send_var({ "OnDialogRequest", db.build() });
     }
 }

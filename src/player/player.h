@@ -1,6 +1,5 @@
 #ifndef PLAYER__PLAYER_H
 #define PLAYER__PLAYER_H
-#include <atomic>
 #include <string>
 #include <enet/enet.h>
 #include <fmt/core.h>
@@ -40,6 +39,7 @@ namespace GTServer {
 
         [[nodiscard]] ENetPeer* get_peer() const { return m_peer; }
         [[nodiscard]] const char* get_ip_address() const { return m_ip_address.data(); }
+        [[nodiscard]] const uint32_t get_user_id() const { return m_userID; }
 
         void disconnect(const enet_uint32& data) {
             enet_peer_disconnect_later(this->get_peer(), data);
@@ -55,6 +55,7 @@ namespace GTServer {
             if (enet_peer_send(m_peer, 0, packet) != 0)
                 enet_packet_destroy(packet);
         }
+
         void send(TankUpdatePacket* tank_packet, uintmax_t data_size) {
             if (!this->get_peer())
                 return;
@@ -63,26 +64,28 @@ namespace GTServer {
             if (!packet || !update_packet)
                 return;
             std::memcpy(packet->data, &tank_packet->type, 4);
+            //DEBUG
+            std::vector<char> array;
+            for(auto i = 0; i < update_packet->data_size; i++)
+                array.push_back(static_cast<char>(reinterpret_cast<uint8_t*>(&update_packet->data)[i]));
+            fmt::print("array: {}\n", array);
             std::memcpy(packet->data + 4, update_packet, sizeof(GameUpdatePacket) + update_packet->data_size);
 
             if (enet_peer_send(m_peer, 0, packet) != 0)
                 enet_packet_destroy(packet);
-        }    
-        void send(int32_t type, const void* data, uintmax_t data_size) {
-            if (!this->get_peer())
-                return;
-            ENetPacket* packet = enet_packet_create(nullptr, 5 + data_size, ENET_PACKET_FLAG_RELIABLE);
-            if (!packet)
-                return;
-            std::memcpy(packet->data, &type, 4);
-            packet->data[data_size + 4] = 0;
-            
-            if (data)
-                std::memcpy(packet->data + 4, data, data_size);
-
-            if (enet_peer_send(m_peer, 0, packet) != 0)
-                enet_packet_destroy(packet);
         }
+
+        void send_text(const std::string& packet) {
+            TankUpdatePacket* tank_packet = (TankUpdatePacket*)std::malloc(sizeof(TankUpdatePacket) + packet.size());
+            tank_packet->type = NET_MESSAGE_GAME_MESSAGE;
+            tank_packet->data = (char*)std::malloc(packet.size());
+            std::memcpy(reinterpret_cast<uint8_t*>(&tank_packet->data), packet.data(), packet.size());
+            reinterpret_cast<uint8_t*>(&tank_packet->data)[packet.size()] = 0;
+
+            this->send(tank_packet, sizeof(TankUpdatePacket) + packet.size());
+            std::free(tank_packet);
+        }
+
         void send_var(const variantlist_t& var, int32_t delay = 0, int32_t net_id = -1) {
             size_t alloc = 1;
             for(const auto& v : var.get_objects())
@@ -105,20 +108,22 @@ namespace GTServer {
             this->send(tank_packet, sizeof(TankUpdatePacket) + sizeof(GameUpdatePacket) + update_packet->data_size);
             std::free(tank_packet);
         }
+
         void send_log(const std::string& msg) {
-            const auto& data = fmt::format("action|log\nmsg|{}", msg);
-            this->send(NET_MESSAGE_GAME_MESSAGE, data.data(), data.size());
+            this->send_text(fmt::format("action|log\nmsg|{}", msg));
         }
+
     public:
         int32_t m_platform = PLATFORM_ID_UNKNOWN;
         void* m_login_info;
 
-        std::atomic<bool> m_logged_on;
+        std::string m_ip_address;
+        std::string m_origin_ip_address;
     private:
+    
+        uint32_t m_userID;
         ENetPeer* m_peer;
         ENetServer* m_server;
-
-        std::string m_ip_address;
     };
 }
 
