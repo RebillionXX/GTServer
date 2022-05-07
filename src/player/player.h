@@ -1,13 +1,15 @@
 #ifndef PLAYER__PLAYER_H
 #define PLAYER__PLAYER_H
+#include <atomic>
 #include <string>
 #include <enet/enet.h>
 #include <fmt/core.h>
 #include <fmt/ranges.h>
+#include <server/server.h>
 #include <proton/packet.h>
 #include <proton/variant.h>
-#include <server/server.h>
-#include <database/item/item_database.h>
+#include <proton/utils/dialog_builder.h>
+#include <proton/utils/text_scanner.h>
 
 namespace GTServer {
     class NetAvatar {
@@ -39,7 +41,6 @@ namespace GTServer {
 
         [[nodiscard]] ENetPeer* get_peer() const { return m_peer; }
         [[nodiscard]] const char* get_ip_address() const { return m_ip_address.data(); }
-        [[nodiscard]] const uint32_t get_user_id() const { return m_userID; }
 
         void disconnect(const enet_uint32& data) {
             enet_peer_disconnect_later(this->get_peer(), data);
@@ -55,7 +56,6 @@ namespace GTServer {
             if (enet_peer_send(m_peer, 0, packet) != 0)
                 enet_packet_destroy(packet);
         }
-
         void send(TankUpdatePacket* tank_packet, uintmax_t data_size) {
             if (!this->get_peer())
                 return;
@@ -64,28 +64,26 @@ namespace GTServer {
             if (!packet || !update_packet)
                 return;
             std::memcpy(packet->data, &tank_packet->type, 4);
-            //DEBUG
-            std::vector<char> array;
-            for(auto i = 0; i < update_packet->data_size; i++)
-                array.push_back(static_cast<char>(reinterpret_cast<uint8_t*>(&update_packet->data)[i]));
-            fmt::print("array: {}\n", array);
             std::memcpy(packet->data + 4, update_packet, sizeof(GameUpdatePacket) + update_packet->data_size);
 
             if (enet_peer_send(m_peer, 0, packet) != 0)
                 enet_packet_destroy(packet);
+        }    
+        void send(int32_t type, const void* data, uintmax_t data_size) {
+            if (!this->get_peer())
+                return;
+            ENetPacket* packet = enet_packet_create(nullptr, 5 + data_size, ENET_PACKET_FLAG_RELIABLE);
+            if (!packet)
+                return;
+            std::memcpy(packet->data, &type, 4);
+            packet->data[data_size + 4] = 0;
+            
+            if (data)
+                std::memcpy(packet->data + 4, data, data_size);
+
+            if (enet_peer_send(m_peer, 0, packet) != 0)
+                enet_packet_destroy(packet);
         }
-
-        void send_text(const std::string& packet) {
-            TankUpdatePacket* tank_packet = (TankUpdatePacket*)std::malloc(sizeof(TankUpdatePacket) + packet.size());
-            tank_packet->type = NET_MESSAGE_GAME_MESSAGE;
-            tank_packet->data = (char*)std::malloc(packet.size());
-            std::memcpy(reinterpret_cast<uint8_t*>(&tank_packet->data), packet.data(), packet.size());
-            reinterpret_cast<uint8_t*>(&tank_packet->data)[packet.size()] = 0;
-
-            this->send(tank_packet, sizeof(TankUpdatePacket) + packet.size());
-            std::free(tank_packet);
-        }
-
         void send_var(const variantlist_t& var, int32_t delay = 0, int32_t net_id = -1) {
             size_t alloc = 1;
             for(const auto& v : var.get_objects())
@@ -108,22 +106,56 @@ namespace GTServer {
             this->send(tank_packet, sizeof(TankUpdatePacket) + sizeof(GameUpdatePacket) + update_packet->data_size);
             std::free(tank_packet);
         }
-
         void send_log(const std::string& msg) {
-            this->send_text(fmt::format("action|log\nmsg|{}", msg));
+            const auto& data = fmt::format("action|log\nmsg|{}", msg);
+            this->send(NET_MESSAGE_GAME_MESSAGE, data.data(), data.size());
         }
-
+    public:
+        enum class dialog_type {
+            REGISTRATION
+        };
+        void send_dialog(const dialog_type& type, text_scanner* parser) {
+            using namespace proton::utils;
+            switch (type) {
+                case dialog_type::REGISTRATION: {
+                    dialog_builder db{};
+                    db.set_default_color('o')
+                        ->add_label_with_icon("`wGTServer V0.0.1``", 0, dialog_builder::LEFT, dialog_builder::BIG)
+                        ->add_spacer();
+                    if (parser->contain("extra"))
+                        db.add_textbox(parser->get("extra"));
+                    db.add_textbox("By choosing a `wGrowID``, you can use a name and password to logon from any devide. Your`` name`` will be shown to other players!")
+                        ->add_text_input("name", "GrowID:", parser->get("name"), 18)
+                        ->add_spacer()
+                        ->add_textbox("Your `wpassword`` must contain`` 8 to 18 characters, 1 letter, 1 number`` and`` 1 special character: @#!$^&*.,``")
+                        ->add_text_input_password("password", "Password:", parser->get("password"), 18)
+                        ->add_text_input_password("verify_password", "Verify Password:", "", 18)
+                        ->add_spacer()
+                        ->add_textbox("Your `wemail address `owill only be used for account verification purposes and won't be spammed or shared. If you use a fake email, you'll never be able to recover or change your password.")
+                        ->add_text_input("email", "Email:", "", 25)
+                        ->add_textbox("Your `wDiscord ID `owill be used for secondary verification if you lost access to your `wemail address`o! Please enter in such format: `wdiscordname#tag`o. Your `wDiscord Tag `ocan be found in your `wDiscord account settings`o.")
+                        ->add_text_input("discord", "Discord:", "", 25)
+                        ->add_textbox("We will never ask you for your password, email or discord, never share it with anyone!")
+                        ->add_spacer()
+                        ->end_dialog("growid", "Disconnect", "Create!");
+                    this->send_var({ "OnDialogRequest", db.get() });
+                    break;
+                }
+                default:
+                    break;
+            }
+            delete parser; //clear memory
+        }
     public:
         int32_t m_platform = PLATFORM_ID_UNKNOWN;
         void* m_login_info;
 
-        std::string m_ip_address;
-        std::string m_origin_ip_address;
+        std::atomic<bool> m_logged_on;
     private:
-    
-        uint32_t m_userID;
         ENetPeer* m_peer;
         ENetServer* m_server;
+
+        std::string m_ip_address;
     };
 }
 

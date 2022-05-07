@@ -1,7 +1,8 @@
 #ifndef PROTON_UTILS__TEXT_SCANNER_H
 #define PROTON_UTILS__TEXT_SCANNER_H
-
+#include <functional>
 #include <string>
+#include <vector>
 #include <unordered_map>
 #include <fmt/core.h>
 
@@ -11,6 +12,10 @@ namespace GTServer
     {
     public:
         text_scanner() = default;
+		text_scanner(const std::vector<std::pair<std::string, std::string>>& data) {
+			for(const auto& it : data)
+				m_data.insert_or_assign(std::move(it.first), std::move(it.second));
+		}
 		~text_scanner() = default;
 
         bool parse(const std::string& data) {
@@ -48,10 +53,10 @@ namespace GTServer
 		bool contain(const std::string& key) {
 			return m_data.find(key) != m_data.end();
 		}
-        const std::string& get(const std::string& key) {
+        const std::string& get(const std::string& key) noexcept {
 			if (this->contain(key))
             	return m_data[key];
-        	return std::string{};
+        	return m_data.begin()->second;
 		}
         const std::unordered_map<std::string, std::string>& get_data() {
 			return m_data;

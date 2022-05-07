@@ -1,17 +1,12 @@
 project(server LANGUAGES CXX)
 
-find_package(Boost 1.36.0)
-if(Boost_FOUND)
-  include_directories(${Boost_INCLUDE_DIRS})
-endif()
-
 file(GLOB INCLUDE_FILES
     *.h
     database/*.h
     database/item/*.h
     events/*.h
     events/text_events/*.h
-    events/action_events/*.h
+    events/text_events/action/*.h
     player/*.h
     proton/*.h
     proton/utils/*.h
@@ -23,6 +18,7 @@ file(GLOB SOURCE_FILES
     database/item/*.cpp
     events/*.cpp
     events/text_events/*.cpp
+    events/text_events/action/*.cpp
     player/*.cpp
     proton/*.cpp
     proton/utils/*.cpp

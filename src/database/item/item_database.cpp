@@ -1,5 +1,4 @@
 #include <database/item/item_database.h>
-#include <database/item/item_components.h>
 #include <filesystem>
 #include <fstream>
 #include <fmt/core.h>
@@ -23,8 +22,6 @@ namespace GTServer {
             return false;
         file.read(m_data, data_size);
         file.close();
-
-        m_hash = utils::text::hash_data(m_data, data_size);
 
         binary_reader br(reinterpret_cast<uint8_t*>(m_data));
         m_version = br.read<uint16_t>();
@@ -89,8 +86,10 @@ namespace GTServer {
             item.m_val4 = br.read<uint32_t>();
             item.m_val5 = br.read<uint32_t>();
 
-            if (i != item.m_id)
-                fmt::print("Detected unordered items: {}/{}.\n", i, item.m_id);
+            if (i != item.m_id) {
+                fmt::print(" - unsupported items.dat version -> {}\n", m_version);
+                break;
+            }
             m_items.push_back(std::move(item));
         }
 

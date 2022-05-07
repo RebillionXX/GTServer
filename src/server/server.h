@@ -9,11 +9,12 @@
 
 namespace GTServer {
     class event_manager;
+    class database;
     class ENetServer {
     public:
         ENetServer(const uint8_t& instanceId, const std::string& address, const uint16_t& port, const size_t& max_peers);
         ~ENetServer();
-        void set_event_manager(event_manager* ev);
+        void set_component(event_manager* ev, database* db);
         
         std::pair<std::string, uint16_t> get_host();
         bool start();
@@ -35,6 +36,7 @@ namespace GTServer {
         std::vector<ENetPeer*> m_peers{};
     private:
         event_manager* m_event_manager;
+        database* m_database;
     };
 }
 

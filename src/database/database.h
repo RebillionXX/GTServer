@@ -1,17 +1,29 @@
 #ifndef DATABASE__DATABASE_H
 #define DATABASE__DATABASE_H
-#include <constants.h>
-#include <server/server_pool.h>
-#include <utils/mysql_result.h>
 #include <mysql_connection.h>
 #include <cppconn/driver.h>
 #include <cppconn/exception.h>
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
 #include <cppconn/prepared_statement.h>
+#include <constants.h>
+#include <server/server_pool.h>
+#include <utils/mysql_result.h>
 
 namespace GTServer {
     class database { //some code has been taken from GrowXYZ
+    public:
+        enum class RegistrationResult {
+            SUCCESS,
+            EXIST_GROWID,
+            INVALID_GROWID,
+            INVALID_PASSWORD,
+            INVALID_EMAIL,
+            INVALID_DISCORD,
+            INVALID_GROWID_LENGTH,
+            INVALID_PASSWORD_LENGTH,
+            BAD_CONNECTION
+        };
     public:
         bool init() {
             try {
@@ -23,7 +35,6 @@ namespace GTServer {
                 m_connection->setSchema(mysql::schema.c_str());
                 return true;
             } catch (const sql::SQLException& e) {
-                fmt::print("SQL driver instance error: {}.\n", e.what());
                 return false;
             }
         }
@@ -47,6 +58,10 @@ namespace GTServer {
             sv_pool->set_user_id(res.get_int("user_identifier"));
             delete m_statement;
             return true;
+        }
+
+        RegistrationResult register_player(const std::string& name, const std::string& password, const std::string& verify_password, const std::string& email, const std::string& discord) {
+            return RegistrationResult::BAD_CONNECTION;
         }
     private:
         sql::Driver* m_driver;

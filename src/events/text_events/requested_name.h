@@ -33,22 +33,14 @@ namespace GTServer::events {
             }
         }
         
-        using namespace proton::utils;
-        dialog_builder db{};
-        db.set_default_color('o')
-            ->add_label_with_icon("`wGet a GrowID``", 206, dialog_builder::LEFT, dialog_builder::BIG)
-            ->add_spacer()
-            ->add_textbox("By choosing a `wGrowID``, you can use a name and password to logon from any devide. Your name will be shown to other players!")
-            ->add_text_input("logon", "Name ", "", 18)
-            ->add_spacer()
-            ->add_textbox("Your `wpassword`` must contain`` 8 to 18 characters, 1 letter, 1 number`` and`` 1 special character: `w@#!$^&*``.,``")
-            ->add_text_input_password("password", "Password ", "", 18)
-            ->add_text_input_password("password_verify", "Password Verify", "", 18)
-            ->add_spacer()
-            ->add_textbox("Your `wemail address`` will only be used for account verification purposes and won't be spammed or shared. If you use a fake email, you'll never be able to recover or change your password.")
-            ->add_text_input("email", "Email ", "", 30)
-            ->add_spacer()
-            ->end_dialog("growid_apply", "`wCancel``", "`wGet a GrowID!``");
-        ctx.m_local->send_var({ "OnDialogRequest", db.build() });
+        ctx.m_local->send_dialog(NetAvatar::dialog_type::REGISTRATION, new text_scanner{
+            { 
+                { "name", ""}, 
+                { "password", "" },
+                { "verify_password", "" },
+                { "email", "" },
+                { "discord", "" }
+            }
+        });
     }
 }

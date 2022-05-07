@@ -1,3 +1,5 @@
+#ifndef EVENTS_TEXT_EVENTS__ACTION_H
+#define EVENTS_TEXT_EVENTS__ACTION_H
 #include <events/event_manager.h>
 #include <proton/utils/text_scanner.h>
 
@@ -13,3 +15,5 @@ namespace GTServer::events {
         }
     }
 }
+
+#endif // EVENTS_TEXT_EVENTS__ACTION_H

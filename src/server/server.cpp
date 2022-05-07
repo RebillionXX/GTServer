@@ -17,8 +17,9 @@ namespace GTServer {
             return;
         delete m_host;
     }
-    void ENetServer::set_event_manager(event_manager* ev) {
+    void ENetServer::set_component(event_manager* ev, database* db) {
         this->m_event_manager = ev;
+        this->m_database = db;
     }
 
     std::pair<std::string, uint16_t> ENetServer::get_host() {
@@ -35,7 +36,7 @@ namespace GTServer {
         
         m_host->checksum = enet_crc32;
         enet_host_compress_with_range_coder(m_host);
-        fmt::print("Starting InstanceID: {}, {}:{} - {}\n", 1, m_address, m_port, std::chrono::system_clock::now());
+        fmt::print("starting instanceId: {}, {}:{} - {}\n", 1, m_address, m_port, std::chrono::system_clock::now());
         m_running.store(true);
         return true;
     }
@@ -52,32 +53,15 @@ namespace GTServer {
     }
     void ENetServer::service() {
         while (m_running.load()) {
-            if (enet_host_service(m_host, &m_event, 1000) < 0x1)
+            if (enet_host_service(m_host, &m_event, 1000) < 1)
                 continue;
             switch(m_event.type) {
                 case ENET_EVENT_TYPE_CONNECT: {
                     NetAvatar* player = new NetAvatar(m_event.peer, this);
-                    uint16_t login_attempts = 0; //TODO: part 1 of bot protection ~ Stormzy
-                    //for (auto& logged : m_host->get_players()) {
-                        //if (logged->get_peer()->address.host == m_event.peer->address.host)
-                            //login_attempts++;
-                    //}
-                    if (login_attempts > 0x3) { //Rebillion, don't delete that. i will use it soon :C
-                        player->send_log("`6>> Private-msg from `4@System``: Server pervented your client from logging into the server due to spam.``");
-                        player->disconnect(0U);
-                        return;
-                    }
-                    else
-                        player->send({ NET_MESSAGE_SERVER_HELLO }, sizeof(TankUpdatePacket));
+                    player->send({ NET_MESSAGE_SERVER_HELLO }, sizeof(TankUpdatePacket));
                     break;
                 }
                 case ENET_EVENT_TYPE_DISCONNECT:
-                    if (m_event.peer->data != nullptr)
-                    {
-                        NetAvatar* local_p = static_cast<NetAvatar*>(m_event.peer->data);
-                        //TODO
-                        delete local_p;
-                    }
                     break;
                 case ENET_EVENT_TYPE_RECEIVE: {
                     if(!m_event.peer || !m_event.peer->data)
@@ -92,22 +76,20 @@ namespace GTServer {
                         case NET_MESSAGE_GAME_MESSAGE: {
                             const auto& str = utils::get_tank_update_data(m_event.packet);
                             text_scanner text;
-                            if (!text.parse(str) || text.get_data().size() == 0x0) {
+                            if (!text.parse(str) || text.get_data().size() == 0) {
                                 player->disconnect(0U);
                                 return;
                             }
                             std::string ev_function = str.substr(0, str.find('|'));
-                            event_manager::context ctx{ player, this, &text };
-                            if (!m_event_manager->call(ev_function, ctx))
+                            event_manager::context ctx{ player, this, m_event_manager, m_database, &text };
+                            if (!m_event_manager->call({ ev_function, event_manager::text_event::TEXT }, ctx))
                                 break;
                             break;
                         }
                         case NET_MESSAGE_GAME_PACKET: {
                             GameUpdatePacket* update_packet = reinterpret_cast<GameUpdatePacket*>(tank_packet->data);
                             if (!update_packet)
-                            return;
-                            if (m_event.packet->dataLength < 0x38) 
-                               return;
+                                break;
                             break;
                         }
                     }

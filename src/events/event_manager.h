@@ -6,31 +6,44 @@
 #include <player/player.h>
 #include <server/server.h>
 #include <proton/packet.h>
-
 namespace GTServer {
+    class database;
     class event_manager {
     public:
+        enum class text_event {
+            TEXT,
+            ACTION
+        };
+
         struct context {
             NetAvatar* m_local;
             ENetServer* m_server;
+            event_manager* m_event_manager;
+            database* m_database;
 
             void* m_data;
         };
+    public:
         event_manager();
         ~event_manager();
 
         void load_events();
 
-        void register_event(const std::string& data, std::function<void(event_manager::context&)> fn);
+        void register_event(const std::pair<std::string, text_event> data, std::function<void(event_manager::context&)> fn);
         void register_event(const uint8_t& data, std::function<void(event_manager::context&)> fn);
 
-        bool call(const std::string& data, event_manager::context& ctx);
+        bool call(const std::pair<std::string, text_event> data, event_manager::context& ctx);
 
+        [[nodiscard]] size_t get_action_events() const { return m_action_event.size(); }
         [[nodiscard]] size_t get_text_events() const { return m_text_events.size(); }
         [[nodiscard]] size_t get_packet_events() const { return m_packet_events.size(); }
     private:
-        std::unordered_map<uint64_t, std::function<void(event_manager::context&)>> m_text_events;
-        std::unordered_map<uint8_t, std::function<void(event_manager::context&)>> m_packet_events;
+        using text_event_value = std::unordered_map<uint64_t, std::function<void(event_manager::context&)>>; 
+        using packet_event_value = std::unordered_map<uint8_t, std::function<void(event_manager::context&)>>;
+
+        text_event_value m_action_event;
+        text_event_value m_text_events;
+        packet_event_value m_packet_events;
     };
 }
 
