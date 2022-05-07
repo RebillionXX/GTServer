@@ -1,4 +1,6 @@
 .vscode/
 .vs/
+.idea/
 build/
 backups/
+cmake-build-debug/
