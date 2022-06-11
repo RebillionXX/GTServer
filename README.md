@@ -13,7 +13,7 @@ a server made for growtopia private server -> [Growtopia](https://growtopiagame.
 - account registration and logon queue
 - world database manager, world event manager and more single thread for handling **WorldNPC**, **WorldEvent** and more
 - worlds randomization for generating world offer and more
-- structure for **WorldTile**, WorldObject** and **World**
+- structure for **WorldTile**, **WorldObject** and **World**
 - **World Data**&**Tile Data** serialization to data (every **single byte** might be the same with **RealGT**
 - many more but lets finish these first **^^**
 
