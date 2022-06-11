@@ -33,9 +33,9 @@ namespace GTServer::events {
             }
         }
         
-        ctx.m_local->send_dialog(NetAvatar::dialog_type::REGISTRATION, new text_scanner{
+        ctx.m_local->send_dialog(NetAvatar::dialog_type::REGISTRATION, new text_scanner {
             { 
-                { "name", ""}, 
+                { "name", "" }, 
                 { "password", "" },
                 { "verify_password", "" },
                 { "email", "" },

@@ -9,6 +9,7 @@
 #include <constants.h>
 #include <server/server_pool.h>
 #include <utils/mysql_result.h>
+#include <utils/text.h>
 
 namespace GTServer {
     class database { //some code has been taken from GrowXYZ
@@ -16,13 +17,14 @@ namespace GTServer {
         enum class RegistrationResult {
             SUCCESS,
             EXIST_GROWID,
-            INVALID_GROWID,
+            INVALID_GROWID, //
             INVALID_PASSWORD,
             INVALID_EMAIL,
             INVALID_DISCORD,
-            INVALID_GROWID_LENGTH,
-            INVALID_PASSWORD_LENGTH,
-            BAD_CONNECTION
+            INVALID_GROWID_LENGTH, //
+            INVALID_PASSWORD_LENGTH, //
+            MISMATCH_VERIFY_PASSWORD, //
+            BAD_CONNECTION //
         };
     public:
         bool init() {
@@ -61,6 +63,15 @@ namespace GTServer {
         }
 
         RegistrationResult register_player(const std::string& name, const std::string& password, const std::string& verify_password, const std::string& email, const std::string& discord) {
+            if (password.length() < 8 || password.length() > 24)
+                return RegistrationResult::INVALID_PASSWORD_LENGTH;
+            if (verify_password != password)
+                return RegistrationResult::MISMATCH_VERIFY_PASSWORD;
+            std::string lower_case_name = name;
+            if (!utils::text::to_lowercase(lower_case_name))
+                return RegistrationResult::INVALID_GROWID;
+            if (lower_case_name.length() < 3 || lower_case_name.length() > 18)
+                return RegistrationResult::INVALID_GROWID_LENGTH;
             return RegistrationResult::BAD_CONNECTION;
         }
     private:
