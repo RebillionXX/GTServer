@@ -26,9 +26,10 @@ namespace GTServer::events {
                 switch(result) {
                     case database::RegistrationResult::SUCCESS: {
                         if (!ctx.m_local->update_internet_protocol()) {
-                            ctx.m_local->send_log("TODO");
+                            ctx.m_local->send_log("`4Oops!`` Couldn't create your account, please try again later.");
                             return;
                         }
+                        ctx.m_local->send_log(fmt::format("DEBUG: my ip_address -> {}", ctx.m_local->get_ip_address()));
                         break;
                     }
                     case database::RegistrationResult::EXIST_GROWID: {
@@ -57,7 +58,7 @@ namespace GTServer::events {
                         });
                         break;
                     }
-                    case database::RegistrationResult::INVALID_EMAIL: {
+                    case database::RegistrationResult::INVALID_EMAIL_OR_DISCORD: {
                         ctx.m_local->send_dialog(NetAvatar::dialog_type::REGISTRATION, new text_scanner {
                             { 
                                 { "name", name }, 
@@ -65,7 +66,7 @@ namespace GTServer::events {
                                 { "verify_password", verify_password },
                                 { "email", email },
                                 { "discord", discord },
-                                { "extra", "`4Oops!``  Look, if you'd like to be able try retrieve your password if you lose it, you'd better enter a real email and discord.  We promise to keep your data 100% private and never spam you." }
+                                { "extra", "`4Oops!``  Look, if you'd like to be able try retrieve your password if you lose it, you'd better enter a real email and discord id.  We promise to keep your data 100% private and never spam you." }
                             }
                         });
                         break;

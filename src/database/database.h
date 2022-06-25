@@ -17,15 +17,14 @@ namespace GTServer {
     public:
         enum class RegistrationResult {
             SUCCESS,
-            EXIST_GROWID, //
-            INVALID_GROWID, //
-            INVALID_PASSWORD,
-            INVALID_EMAIL, //
-            INVALID_DISCORD,
-            INVALID_GROWID_LENGTH, //
-            INVALID_PASSWORD_LENGTH, //
-            MISMATCH_VERIFY_PASSWORD, //
-            BAD_CONNECTION //
+            EXIST_GROWID,
+            INVALID_GROWID,
+            INVALID_PASSWORD, //
+            INVALID_EMAIL_OR_DISCORD,
+            INVALID_GROWID_LENGTH,
+            INVALID_PASSWORD_LENGTH,
+            MISMATCH_VERIFY_PASSWORD,
+            BAD_CONNECTION
         };
     public:
         bool init() {
@@ -74,8 +73,8 @@ namespace GTServer {
                 return RegistrationResult::INVALID_PASSWORD_LENGTH;
             if (verify_password != password)
                 return RegistrationResult::MISMATCH_VERIFY_PASSWORD;
-            if (!utils::text::email_validation(email))
-                return RegistrationResult::INVALID_EMAIL;
+            if (!utils::text::is_valid_email(email) || !utils::text::is_valid_discord(discord))
+                return RegistrationResult::INVALID_EMAIL_OR_DISCORD;
             std::string lower_case_name = name;
             if (!utils::text::to_lowercase(lower_case_name))
                 return RegistrationResult::INVALID_GROWID;
