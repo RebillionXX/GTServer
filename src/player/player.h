@@ -46,6 +46,10 @@ namespace GTServer {
             enet_peer_disconnect_later(this->get_peer(), data);
         }
 
+        bool update_internet_protocol() {
+            return enet_address_get_host_ip(&m_peer->address, m_ip_address.data(), 16) < 0 ? false : true;
+        }
+
         void send(TankUpdatePacket tank_packet, uintmax_t data_size) {
             if (!this->get_peer())
                 return;
@@ -144,7 +148,7 @@ namespace GTServer {
                 default:
                     break;
             }
-            delete parser; //clear memory
+            delete parser;
         }
     public:
         int32_t m_platform = PLATFORM_ID_UNKNOWN;

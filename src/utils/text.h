@@ -1,11 +1,15 @@
 #ifndef UTILS__TEXT_H
 #define UTILS__TEXT_H
 #include <cctype>
+#include <regex>
 #include <string_view>
 
 namespace utils::text {
-    constexpr bool to_lowercase(std::string& str)
-    {
+    const bool email_validation(const std::string& email) {
+        const std::regex pattern("(\\w+)(\\.|_)?(\\w*)@(\\w+)(\\.(\\w+))+");
+        return std::regex_match(email, pattern); //https://www.codespeedy.com/program-to-validate-email-id-using-regex-in-cpp/
+    }
+    constexpr bool to_lowercase(std::string& str) {
         if (str.empty()) 
             return false;
 

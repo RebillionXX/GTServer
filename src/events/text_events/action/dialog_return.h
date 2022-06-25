@@ -24,6 +24,13 @@ namespace GTServer::events {
                     return;
                 const auto& result = ctx.m_database->register_player(name, password, verify_password, email, discord);
                 switch(result) {
+                    case database::RegistrationResult::SUCCESS: {
+                        if (!ctx.m_local->update_internet_protocol()) {
+                            ctx.m_local->send_log("TODO");
+                            return;
+                        }
+                        break;
+                    }
                     case database::RegistrationResult::EXIST_GROWID: {
                         ctx.m_local->send_dialog(NetAvatar::dialog_type::REGISTRATION, new text_scanner {
                             { 
@@ -46,6 +53,19 @@ namespace GTServer::events {
                                 { "email", email },
                                 { "discord", discord },
                                 { "extra", "`4Oops!``  the name is includes invalid characters." }
+                            }
+                        });
+                        break;
+                    }
+                    case database::RegistrationResult::INVALID_EMAIL: {
+                        ctx.m_local->send_dialog(NetAvatar::dialog_type::REGISTRATION, new text_scanner {
+                            { 
+                                { "name", name }, 
+                                { "password", password },
+                                { "verify_password", verify_password },
+                                { "email", email },
+                                { "discord", discord },
+                                { "extra", "`4Oops!``  Look, if you'd like to be able try retrieve your password if you lose it, you'd better enter a real email and discord.  We promise to keep your data 100% private and never spam you." }
                             }
                         });
                         break;

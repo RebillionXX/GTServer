@@ -1,5 +1,6 @@
 #ifndef DATABASE__DATABASE_H
 #define DATABASE__DATABASE_H
+#include <algorithm>
 #include <mysql_connection.h>
 #include <cppconn/driver.h>
 #include <cppconn/exception.h>
@@ -16,10 +17,10 @@ namespace GTServer {
     public:
         enum class RegistrationResult {
             SUCCESS,
-            EXIST_GROWID,
+            EXIST_GROWID, //
             INVALID_GROWID, //
             INVALID_PASSWORD,
-            INVALID_EMAIL,
+            INVALID_EMAIL, //
             INVALID_DISCORD,
             INVALID_GROWID_LENGTH, //
             INVALID_PASSWORD_LENGTH, //
@@ -40,7 +41,6 @@ namespace GTServer {
                 return false;
             }
         }
-
         sql::ResultSet* query(const std::string& query) {
             if (!m_connection->isValid())
                 m_connection->reconnect();
@@ -62,17 +62,30 @@ namespace GTServer {
             return true;
         }
 
+        
+        bool is_player_exist(const std::string& name) {
+            sql::ResultSet* result = this->query(fmt::format("SELECT * FROM `players` WHERE tank_id_name='{}' LIMIT 1", name));
+            bool ret = (!result ? true : (result->rowsCount() > 0 ? true : false));
+            delete result;
+            return ret;
+        }
         RegistrationResult register_player(const std::string& name, const std::string& password, const std::string& verify_password, const std::string& email, const std::string& discord) {
             if (password.length() < 8 || password.length() > 24)
                 return RegistrationResult::INVALID_PASSWORD_LENGTH;
             if (verify_password != password)
                 return RegistrationResult::MISMATCH_VERIFY_PASSWORD;
+            if (!utils::text::email_validation(email))
+                return RegistrationResult::INVALID_EMAIL;
             std::string lower_case_name = name;
             if (!utils::text::to_lowercase(lower_case_name))
                 return RegistrationResult::INVALID_GROWID;
             if (lower_case_name.length() < 3 || lower_case_name.length() > 18)
                 return RegistrationResult::INVALID_GROWID_LENGTH;
-            return RegistrationResult::BAD_CONNECTION;
+            if (this->is_player_exist(lower_case_name))
+                return RegistrationResult::EXIST_GROWID;
+            if (!m_connection->isValid())
+                return RegistrationResult::BAD_CONNECTION;
+            return RegistrationResult::SUCCESS;
         }
     private:
         sql::Driver* m_driver;
