@@ -19,7 +19,7 @@ a server made for growtopia private server -> [Growtopia](https://growtopiagame.
 
 ## Requirement
 To building this source, you would need to install these libraries:
-- [Boost](https://www.boost.org/)
+- [Boost](https://www.boost.org/) (You'll need x64 for this)
 
 ## How to build the source - starting path (GTServer/)
 ```shell
