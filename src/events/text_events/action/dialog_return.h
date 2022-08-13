@@ -33,81 +33,75 @@ namespace GTServer::events {
                         break;
                     }
                     case database::RegistrationResult::EXIST_GROWID: {
-                        ctx.m_local->send_dialog(NetAvatar::dialog_type::REGISTRATION, new text_scanner {
-                            { 
-                                { "name", name }, 
-                                { "password", password },
-                                { "verify_password", verify_password },
-                                { "email", email },
-                                { "discord", discord },
-                                { "extra", fmt::format("`4Oops!`` The name `w{}`` is so cool someone else has already taken it.  Please choose a different name.", name) }
-                            }
-                        });
+                        ctx.m_local->send_dialog(Player::dialog_type::REGISTRATION, text_scanner
+                        ({ 
+                            { "name", name }, 
+                            { "password", password },
+                            { "verify_password", verify_password },
+                            { "email", email },
+                            { "discord", discord },
+                            { "extra", fmt::format("`4Oops!`` The name `w{}`` is so cool someone else has already taken it.  Please choose a different name.", name) }
+                        }));
                         break;
                     }
                     case database::RegistrationResult::INVALID_GROWID: {
-                        ctx.m_local->send_dialog(NetAvatar::dialog_type::REGISTRATION, new text_scanner {
-                            { 
-                                { "name", name }, 
-                                { "password", password },
-                                { "verify_password", verify_password },
-                                { "email", email },
-                                { "discord", discord },
-                                { "extra", "`4Oops!``  the name is includes invalid characters." }
-                            }
-                        });
+                        ctx.m_local->send_dialog(Player::dialog_type::REGISTRATION, text_scanner
+                        ({
+                            { "name", name }, 
+                            { "password", password },
+                            { "verify_password", verify_password },
+                            { "email", email },
+                            { "discord", discord },
+                            { "extra", "`4Oops!``  the name is includes invalid characters." }
+                        }));
                         break;
                     }
                     case database::RegistrationResult::INVALID_EMAIL_OR_DISCORD: {
-                        ctx.m_local->send_dialog(NetAvatar::dialog_type::REGISTRATION, new text_scanner {
-                            { 
-                                { "name", name }, 
-                                { "password", password },
-                                { "verify_password", verify_password },
-                                { "email", email },
-                                { "discord", discord },
-                                { "extra", "`4Oops!``  Look, if you'd like to be able try retrieve your password if you lose it, you'd better enter a real email and discord id.  We promise to keep your data 100% private and never spam you." }
-                            }
-                        });
+                        ctx.m_local->send_dialog(Player::dialog_type::REGISTRATION, text_scanner
+                        ({
+                            { "name", name }, 
+                            { "password", password },
+                            { "verify_password", verify_password },
+                            { "email", email },
+                            { "discord", discord },
+                            { "extra", "`4Oops!``  Look, if you'd like to be able try retrieve your password if you lose it, you'd better enter a real email and discord id.  We promise to keep your data 100% private and never spam you." }
+                        }));
                         break;
                     }
                     case database::RegistrationResult::INVALID_GROWID_LENGTH: {
-                        ctx.m_local->send_dialog(NetAvatar::dialog_type::REGISTRATION, new text_scanner {
-                            { 
-                                { "name", name }, 
-                                { "password", password },
-                                { "verify_password", verify_password },
-                                { "email", email },
-                                { "discord", discord },
-                                { "extra", "`4Oops!``  Your `wGrowID`` must be between `$3`` and `$18`` characters long." }
-                            }
-                        });
+                        ctx.m_local->send_dialog(Player::dialog_type::REGISTRATION, text_scanner
+                        ({ 
+                            { "name", name }, 
+                            { "password", password },
+                            { "verify_password", verify_password },
+                            { "email", email },
+                            { "discord", discord },
+                            { "extra", "`4Oops!``  Your `wGrowID`` must be between `$3`` and `$18`` characters long." }
+                        }));
                         break;
                     }
                     case database::RegistrationResult::INVALID_PASSWORD_LENGTH: {
-                        ctx.m_local->send_dialog(NetAvatar::dialog_type::REGISTRATION, new text_scanner {
-                            { 
-                                { "name", name }, 
-                                { "password", "" },
-                                { "verify_password", "" },
-                                { "email", email },
-                                { "discord", discord },
-                                { "extra", "`4Oops!``  Your password must be between `$8`` and `$24`` characters long." }
-                            }
-                        });
+                        ctx.m_local->send_dialog(Player::dialog_type::REGISTRATION, text_scanner
+                        ({ 
+                            { "name", name }, 
+                            { "password", "" },
+                            { "verify_password", "" },
+                            { "email", email },
+                            { "discord", discord },
+                            { "extra", "`4Oops!``  Your password must be between `$8`` and `$24`` characters long." }
+                        }));
                         break;
                     }
                     case database::RegistrationResult::MISMATCH_VERIFY_PASSWORD: {
-                        ctx.m_local->send_dialog(NetAvatar::dialog_type::REGISTRATION, new text_scanner {
-                            { 
-                                { "name", name }, 
-                                { "password", password },
-                                { "verify_password", verify_password },
-                                { "email", email },
-                                { "discord", discord },
-                                { "extra", "`4Oops!``  Passwords don't match.  Try again." }
-                            }
-                        });
+                        ctx.m_local->send_dialog(Player::dialog_type::REGISTRATION, text_scanner
+                        ({   
+                            { "name", name }, 
+                            { "password", password },
+                            { "verify_password", verify_password },
+                            { "email", email },
+                            { "discord", discord },
+                            { "extra", "`4Oops!``  Passwords don't match.  Try again." }
+                        }));
                         break;
                     }
                     case database::RegistrationResult::BAD_CONNECTION: {

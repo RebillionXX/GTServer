@@ -12,7 +12,7 @@
 #include <proton/utils/text_scanner.h>
 
 namespace GTServer {
-    class NetAvatar {
+    class Player {
     public:
         enum : int32_t {
             PLATFORM_ID_UNKNOWN = -1,
@@ -28,7 +28,7 @@ namespace GTServer {
             PLATFORM_ID_HTML5
         };
     public:
-        NetAvatar(ENetPeer* peer, server* server) 
+        Player(ENetPeer* peer, server* server) 
         : m_peer(peer), m_server(server) {
             if(!m_peer)
                 return;
@@ -37,7 +37,7 @@ namespace GTServer {
             m_ip_address.reserve(16);
             enet_address_get_host_ip(&m_peer->address, m_ip_address.data(), 16);
         }
-        ~NetAvatar() = default;
+        ~Player() = default;
 
         [[nodiscard]] ENetPeer* get_peer() const { return m_peer; }
         [[nodiscard]] const char* get_ip_address() const { return m_ip_address.data(); }
@@ -118,7 +118,7 @@ namespace GTServer {
         enum class dialog_type {
             REGISTRATION
         };
-        void send_dialog(const dialog_type& type, text_scanner* parser) {
+        void send_dialog(const dialog_type& type, text_scanner parser) {
             using namespace proton::utils;
             switch (type) {
                 case dialog_type::REGISTRATION: {
@@ -126,19 +126,19 @@ namespace GTServer {
                     db.set_default_color('o')
                         ->add_label_with_icon("`wGTServer V0.0.1``", 0, dialog_builder::LEFT, dialog_builder::BIG)
                         ->add_spacer();
-                    if (parser->contain("extra"))
-                        db.add_textbox(parser->get("extra"))->add_spacer();
+                    if (parser.contain("extra"))
+                        db.add_textbox(parser.get("extra"))->add_spacer();
                     db.add_textbox("By choosing a `wGrowID``, you can use a name and password to logon from any devide. Your`` name`` will be shown to other players!")
-                        ->add_text_input("name", "GrowID:", parser->get("name"), 18)
+                        ->add_text_input("name", "GrowID:", parser.get("name"), 18)
                         ->add_spacer()
                         ->add_textbox("Your `wpassword`` must contain`` 8 to 18 characters, 1 letter, 1 number`` and`` 1 special character: @#!$^&*.,``")
-                        ->add_text_input_password("password", "Password:", parser->get("password"), 18)
-                        ->add_text_input_password("verify_password", "Verify Password:", parser->get("verify_password"), 18)
+                        ->add_text_input_password("password", "Password:", parser.get("password"), 18)
+                        ->add_text_input_password("verify_password", "Verify Password:", parser.get("verify_password"), 18)
                         ->add_spacer()
                         ->add_textbox("Your `wemail address `owill only be used for account verification purposes and won't be spammed or shared. If you use a fake email, you'll never be able to recover or change your password.")
-                        ->add_text_input("email", "Email:", parser->get("email"), 25)
+                        ->add_text_input("email", "Email:", parser.get("email"), 25)
                         ->add_textbox("Your `wDiscord ID `owill be used for secondary verification if you lost access to your `wemail address`o! Please enter in such format: `wdiscordname#tag`o. Your `wDiscord Tag `ocan be found in your `wDiscord account settings`o.")
-                        ->add_text_input("discord", "Discord:", parser->get("discord"), 25)
+                        ->add_text_input("discord", "Discord:", parser.get("discord"), 25)
                         ->add_textbox("We will never ask you for your password, email or discord, never share it with anyone!")
                         ->add_spacer()
                         ->end_dialog("growid", "Disconnect", "Create!");
@@ -148,7 +148,6 @@ namespace GTServer {
                 default:
                     break;
             }
-            delete parser;
         }
     public:
         int32_t m_platform = PLATFORM_ID_UNKNOWN;

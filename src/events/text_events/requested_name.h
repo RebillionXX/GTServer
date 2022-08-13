@@ -7,14 +7,12 @@
 namespace GTServer::events {
     void requested_name(event_manager::context& ctx) {
         text_scanner* parser = static_cast<text_scanner*>(ctx.m_data);
-        if (!(
-            parser->try_get("platformID", ctx.m_local->m_platform)
-        )) {
+        if (!parser->try_get<int32_t>("platformID", ctx.m_local->m_platform)) {
             ctx.m_local->disconnect(0U);    
             return;
         }
         switch (ctx.m_local->m_platform) {
-            case NetAvatar::PLATFORM_ID_WINDOWS: {
+            case Player::PLATFORM_ID_WINDOWS: {
                 ctx.m_local->m_login_info = (void*)(new WindowsPlayer());
                 const auto& platform = static_cast<WindowsPlayer*>(ctx.m_local->m_login_info);
                 if (!(
@@ -33,14 +31,13 @@ namespace GTServer::events {
             }
         }
         
-        ctx.m_local->send_dialog(NetAvatar::dialog_type::REGISTRATION, new text_scanner {
-            { 
-                { "name", "" }, 
-                { "password", "" },
-                { "verify_password", "" },
-                { "email", "" },
-                { "discord", "" }
-            }
-        });
+        ctx.m_local->send_dialog(Player::dialog_type::REGISTRATION, text_scanner
+        ({ 
+            { "name", "" }, 
+            { "password", "" },
+            { "verify_password", "" },
+            { "email", "" },
+            { "discord", "" }
+        }));
     }
 }

@@ -1,90 +1,140 @@
 #ifndef PROTON_UTILS__TEXT_SCANNER_H
 #define PROTON_UTILS__TEXT_SCANNER_H
-#include <functional>
+#include <algorithm>
+#include <ranges>
 #include <string>
 #include <vector>
-#include <unordered_map>
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 namespace GTServer
 {
-    class text_scanner
-    {
+    class text_scanner { //thanks to ztz who helped me on this
     public:
-        text_scanner() = default;
-		text_scanner(const std::vector<std::pair<std::string, std::string>>& data) {
-			for(const auto& it : data)
-				m_data.insert_or_assign(std::move(it.first), std::move(it.second));
-		}
-		~text_scanner() = default;
+        text_scanner() : m_data() {}
+        explicit text_scanner(const std::string& string) { 
+            this->parse(string); 
+        }
+        explicit text_scanner(const std::vector<std::pair<std::string, std::string>>& data) {
+            for (const auto& it : data)
+                this->add(it.first, it.second);
+        }
+        ~text_scanner() = default;
 
-        bool parse(const std::string& data) {
-			try {
-				std::string::size_type key_pos = 0;
-				std::string::size_type i = 0;
-				std::string key, val;
+        void parse(const std::string& string) {
+            m_data = this->string_tokenize(string, "\n");
+            for (auto &data : m_data) {
+                std::replace(data.begin(), data.end(), '\r', '\0');
+            }
+        }
+        static std::vector<std::string> string_tokenize(const std::string &string, const std::string &delimiter = "|") {
+            std::vector<std::string> tokens{};
+            for (const auto& word : std::views::split(string, delimiter))
+                tokens.emplace_back(word.begin(), word.end());
+            return tokens;
+        }
 
-				while (i != std::string::npos) {
-					if (i + 2 >= data.size()) 
-						break;
-					key_pos = data.find('|', i + 2);
-					if (key_pos == std::string::npos)
-						break;
-					key = data.substr((i == 0 || i == 1 ? i : i + 1), key_pos - i - (i == 0 || i == 1 ? 0 : 1));
-					if (i + 1 >= data.size()) break;
+        std::string get(const std::string &key, int index = 1, const std::string &token = "|", int key_index = 0)
+        {
+            if (m_data.empty())
+                return "";
 
-					i = data.find('\n', i + 1);
-					if (i == std::string::npos)
-						val = data.substr(key_pos + 1);
-					else
-						val = data.substr(key_pos + 1, i - key_pos - 1);
-					m_data.insert_or_assign(std::move(key), std::move(val));
-				}
-				return true;
-			}
-			catch (std::exception e) {
-				return false;
-			}
-			catch (...) {
-				return false;
-			}
-		}
-
-		bool contain(const std::string& key) {
-			return m_data.find(key) != m_data.end();
-		}
-        const std::string& get(const std::string& key) noexcept {
-			if (this->contain(key))
-            	return m_data[key];
-        	return m_data.begin()->second;
-		}
-        const std::unordered_map<std::string, std::string>& get_data() {
-			return m_data;
-		}
+            for (auto &data : m_data) {
+                if (data.empty())
+                    continue;
+                std::vector<std::string> tokenize = this->string_tokenize(data, token);
+                if (tokenize[key_index] == key) {
+                    if (index < 0 || index >= tokenize.size())
+                        return "";
+                    return tokenize[key_index + index];
+                }
+            }
+            return "";
+        }
+        template<typename T, typename std::enable_if_t<std::is_integral_v<T>, bool> = true>
+        T get(const std::string &key, int index = 1, const std::string &token = "|") {
+            return std::stoi(this->get(key, index, token));
+        }
+        template<typename T, typename std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+        T get(const std::string &key, int index = 1, const std::string &token = "|") {
+            if (std::is_same_v<T, double>)
+                return std::stod(this->get(key, index, token));
+            else if (std::is_same_v<T, long double>)
+                return std::stold(this->get(key, index, token));
+            return std::stof(this->get(key, index, token));
+        }
 
 		bool try_get(const std::string& key, std::string& value) noexcept {
-			auto it = m_data.find(key);
-			if (it == m_data.end())
+			if (!this->contain(key))
 				return false;
-			value = it->second;
+			value = this->get(key);
 			return true;
 		}
-		bool try_get(const std::string& key, int& value) noexcept {
-			auto it = m_data.find(key);
-			if (it == m_data.end())
+        template<typename T, typename std::enable_if_t<std::is_integral_v<T>, bool> = true>
+        bool try_get(const std::string& key, T &value) noexcept {
+			if (!this->contain(key))
 				return false;
-			value = std::atoi(it->second.c_str());
+			value = std::stoi(this->get(key));
 			return true;
 		}
-		bool try_get(const std::string& key, bool& value) noexcept {
-			auto it = m_data.find(key);
-			if (it == m_data.end())
-				return false;
-			value = it->second == "1";
-			return true;
+
+        void add(const std::string &key, const std::string &value, const std::string &token = "|") {
+            m_data.push_back(key + token + value);
+        }
+        template<typename T, typename std::enable_if_t<std::is_integral_v<T> || std::is_floating_point_v<T>, bool> = true>
+        void add(const std::string &key, const T &value, const std::string &token = "|") {
+            this->add(key, std::to_string(value), token);
+        }
+        void set(const std::string &key, const std::string &value, const std::string &token = "|") {
+            if (m_data.empty())
+                return;
+
+            for (auto &data : m_data) {
+                std::vector<std::string> tokenize = this->string_tokenize(data, token);
+                if (tokenize[0] == key) {
+                    data = std::string{ tokenize[0] };
+                    data += token;
+                    data += value;
+                    break;
+                }
+            }
+        }
+        template<typename T, typename std::enable_if_t<std::is_integral_v<T> || std::is_floating_point_v<T>, bool> = true>
+        void set(const std::string &key, const T &value, const std::string &token = "|") {
+            this->set(key, std::to_string(value), token);
+        }
+
+		bool contain(const std::string& key) {
+			return this->get(key) != "" ? true : false;
 		}
+
+        std::vector<std::string> get_all_array()
+        {
+            std::vector<std::string> ret{};
+            for(int i = 0; i < m_data.size(); i++)
+                ret.push_back(fmt::format("[{}]: {}", i, m_data[i]));
+
+            return ret;
+        }
+        std::string get_all_raw()
+        {
+            std::string string{};
+            for (int i = 0; i < m_data.size(); i++) {
+                string += m_data.at(i);
+                if (i + 1 >= m_data.size())
+                    continue;
+
+                if (!m_data.at(i + 1).empty())
+                    string += '\n';
+            }
+
+            return string;
+        }
+
+        bool empty() { return m_data.empty(); }
+        std::size_t size() { return m_data.size(); }
+
     private:
-        std::unordered_map<std::string, std::string> m_data;
+        std::vector<std::string> m_data;
     };
 }
 

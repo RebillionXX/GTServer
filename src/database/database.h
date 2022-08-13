@@ -78,7 +78,6 @@ namespace GTServer {
             delete m_statement;
             return true;
         }
-
         
         bool is_player_exist(const std::string& name) {
             sql::ResultSet* result = this->query(fmt::format("SELECT * FROM `players` WHERE tank_id_name='{}' LIMIT 1", name));

@@ -15,23 +15,17 @@
 
 using namespace GTServer;
 database* g_database;
-http_server* g_http;
 server_pool* g_servers;
 event_manager* g_event_manager;
-
-void exit_handler(int sig) {
-    for (auto& pair : g_servers->get_servers())
-        g_servers->stop_instance(pair.first);
-    g_http->stop();
-    g_servers->deinitialize_enet();
-    exit(EXIT_SUCCESS);
-}
 
 int main() {
     fmt::print("starting GTServer version 0.0.2\n");
 #ifdef HTTP_SERVER
-    g_http = new http_server({ "0.0.0.0", 443 });
-    if (!g_http->listen())
+    auto http_server{ std::make_unique<GTServer::http_server>(
+        std::string{ constants::http::address.begin(), constants::http::address.end() }, 
+        constants::http::port
+    ) };
+    if (!http_server->listen())
         fmt::print("failed to starting http server, please run an external http service.\n");
 #endif
     g_servers = new server_pool();
@@ -67,6 +61,5 @@ int main() {
         server->set_component(g_event_manager, g_database);
         server->start_service();
     }
-    signal (SIGINT, exit_handler);
     while(true);
 }

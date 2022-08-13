@@ -57,7 +57,7 @@ namespace GTServer {
                 continue;
             switch(m_event.type) {
                 case ENET_EVENT_TYPE_CONNECT: {
-                    NetAvatar* player = new NetAvatar(m_event.peer, this);
+                    Player* player = new Player(m_event.peer, this);
                     player->send({ NET_MESSAGE_SERVER_HELLO }, sizeof(TankUpdatePacket));
                     break;
                 }
@@ -68,20 +68,16 @@ namespace GTServer {
                         return;
                     if(m_event.packet->dataLength < sizeof(TankUpdatePacket::type) + 1 || m_event.packet->dataLength > 0x200)
                         return;
-                    NetAvatar* player = static_cast<NetAvatar*>(m_event.peer->data);
+                    Player* player = static_cast<Player*>(m_event.peer->data);
                     const auto& tank_packet = reinterpret_cast<TankUpdatePacket*>(m_event.packet->data);
                     
                     switch (tank_packet->type) {
                         case NET_MESSAGE_GENERIC_TEXT:
                         case NET_MESSAGE_GAME_MESSAGE: {
                             const auto& str = utils::get_tank_update_data(m_event.packet);
-                            text_scanner text;
-                            if (!text.parse(str) || text.get_data().size() == 0) {
-                                player->disconnect(0U);
-                                return;
-                            }
+                            text_scanner parser{ str };
                             std::string ev_function = str.substr(0, str.find('|'));
-                            event_manager::context ctx{ player, this, m_event_manager, m_database, &text };
+                            event_manager::context ctx{ player, this, m_event_manager, m_database, &parser };
                             if (!m_event_manager->call({ ev_function, event_manager::text_event::TEXT }, ctx))
                                 break;
                             break;
