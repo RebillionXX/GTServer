@@ -10,10 +10,10 @@
 namespace GTServer {
     class event_manager;
     class database;
-    class ENetServer {
+    class server {
     public:
-        ENetServer(const uint8_t& instanceId, const std::string& address, const uint16_t& port, const size_t& max_peers);
-        ~ENetServer();
+        server(const uint8_t& instanceId, const std::string& address, const uint16_t& port, const size_t& max_peers);
+        ~server();
         void set_component(event_manager* ev, database* db);
         
         std::pair<std::string, uint16_t> get_host();

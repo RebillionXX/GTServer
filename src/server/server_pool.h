@@ -8,17 +8,30 @@
 namespace GTServer {
     class server_pool {
     public:
-        server_pool() = default;
+        server_pool() {
+            fmt::print("initializing server_pool\n");
+        }
         ~server_pool() = default;
 
-        std::unordered_map<uint8_t, ENetServer*> get_servers() {
+        bool initialize_enet() {
+            if (enet_initialize() != 0) {
+                fmt::print("failed to initialize enet service\n");
+                return false;
+            }
+            return true;
+        }
+        bool deinitialize_enet() {
+            enet_deinitialize();
+        }
+
+        std::unordered_map<uint8_t, server*> get_servers() {
             return m_servers;
         }
-        ENetServer* start_instance() {
+        server* start_instance() {
             uint8_t instanceId = static_cast<uint8_t>(m_servers.size());
-            auto server = new ENetServer(++instanceId, m_address, m_port++, m_max_peers);
-            m_servers.insert_or_assign(instanceId, server);
-            return server;
+            auto svr = new server(++instanceId, m_address, m_port++, m_max_peers);
+            m_servers.insert_or_assign(instanceId, svr);
+            return svr;
         }
         void stop_instance(const uint8_t& instanceId) {
             fmt::print("shutting down instanceId: {} - {}\n", instanceId, std::chrono::system_clock::now());
@@ -43,7 +56,7 @@ namespace GTServer {
         size_t m_max_peers{ 0xFF };
 
         int user_id{ 0 };
-        std::unordered_map<uint8_t, ENetServer*> m_servers{};
+        std::unordered_map<uint8_t, server*> m_servers{};
     };
 }
 #endif // SERVER__SERVER_POOL_H

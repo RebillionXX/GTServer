@@ -17,7 +17,7 @@ namespace GTServer {
 
         struct context {
             NetAvatar* m_local;
-            ENetServer* m_server;
+            server* m_server;
             event_manager* m_event_manager;
             database* m_database;
 

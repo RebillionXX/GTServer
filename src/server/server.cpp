@@ -9,23 +9,23 @@
 #include <utils/packet.h>
 
 namespace GTServer {
-    ENetServer::ENetServer(const uint8_t& instanceId, const std::string& address, const uint16_t& port, const size_t& max_peers) : 
+    server::server(const uint8_t& instanceId, const std::string& address, const uint16_t& port, const size_t& max_peers) : 
         m_instanceId(instanceId), m_address(address), m_port(port), m_max_peers(max_peers) {
     }
-    ENetServer::~ENetServer() {
+    server::~server() {
         if(!this->stop())
             return;
         delete m_host;
     }
-    void ENetServer::set_component(event_manager* ev, database* db) {
+    void server::set_component(event_manager* ev, database* db) {
         this->m_event_manager = ev;
         this->m_database = db;
     }
 
-    std::pair<std::string, uint16_t> ENetServer::get_host() {
+    std::pair<std::string, uint16_t> server::get_host() {
         return { m_address, m_port };
     }
-    bool ENetServer::start() {
+    bool server::start() {
         ENetAddress address;
         enet_address_set_host(&address, m_address.c_str());
         address.port = m_port;
@@ -40,18 +40,18 @@ namespace GTServer {
         m_running.store(true);
         return true;
     }
-    bool ENetServer::stop() {
+    bool server::stop() {
         for (auto& peer : m_peers)
             enet_peer_disconnect_later(peer, 0U);
         m_running.store(false);
         return true;
     }
 
-    void ENetServer::start_service() {
-        m_service = std::thread{ &ENetServer::service, this };
+    void server::start_service() {
+        m_service = std::thread{ &server::service, this };
         m_service.detach();
     }
-    void ENetServer::service() {
+    void server::service() {
         while (m_running.load()) {
             if (enet_host_service(m_host, &m_event, 1000) < 1)
                 continue;

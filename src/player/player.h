@@ -28,7 +28,7 @@ namespace GTServer {
             PLATFORM_ID_HTML5
         };
     public:
-        NetAvatar(ENetPeer* peer, ENetServer* server) 
+        NetAvatar(ENetPeer* peer, server* server) 
         : m_peer(peer), m_server(server) {
             if(!m_peer)
                 return;
@@ -157,7 +157,7 @@ namespace GTServer {
         std::atomic<bool> m_logged_on;
     private:
         ENetPeer* m_peer;
-        ENetServer* m_server;
+        server* m_server;
 
         std::string m_ip_address;
     };

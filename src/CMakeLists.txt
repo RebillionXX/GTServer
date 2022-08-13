@@ -39,6 +39,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 target_compile_definitions(${PROJECT_NAME} PUBLIC
     NOMINMAX
     WIN32_LEAN_AND_MEAN
+    CPPHTTPLIB_OPENSSL_SUPPORT
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

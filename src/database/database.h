@@ -7,14 +7,21 @@
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
 #include <cppconn/prepared_statement.h>
-#include <constants.h>
+#include <configs.h>
 #include <server/server_pool.h>
 #include <utils/mysql_result.h>
 #include <utils/text.h>
 
 namespace GTServer {
-    class database { //some code has been taken from GrowXYZ
+    class database {
     public:
+        typedef struct {
+            std::string m_host;
+            std::string m_username;
+            std::string m_password;
+            std::string m_schema;
+        } settings;
+        
         enum class RegistrationResult {
             SUCCESS,
             EXIST_GROWID,
@@ -27,14 +34,25 @@ namespace GTServer {
             BAD_CONNECTION
         };
     public:
+        database(const database::settings& setting) : m_settings(setting) {
+            fmt::print("initializing database\n");
+            fmt::print(" - {} mysql server {}@{} -> {}\n", this->init() ? 
+                "connected to" : "failed to connect", 
+            this->m_settings.m_host, this->m_settings.m_username, this->m_settings.m_schema);
+        }
+        ~database();
+
         bool init() {
             try {
-                using namespace constants;
                 m_driver = get_driver_instance();
-                m_connection = m_driver->connect(mysql::host.c_str(), mysql::username.c_str(), mysql::password.c_str());
+                m_connection = m_driver->connect(
+                    this->m_settings.m_host.c_str(), 
+                    this->m_settings.m_username.c_str(), 
+                    this->m_settings.m_password.c_str()
+                );
                 if (!m_connection)
                     return false;
-                m_connection->setSchema(mysql::schema.c_str());
+                m_connection->setSchema(this->m_settings.m_schema.c_str());
                 return true;
             } catch (const sql::SQLException& e) {
                 return false;
@@ -90,6 +108,8 @@ namespace GTServer {
         sql::Driver* m_driver;
         sql::Connection* m_connection;
         sql::Statement* m_statement;
+
+        database::settings m_settings;
     };
 }
 

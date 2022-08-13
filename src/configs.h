@@ -1,7 +1,9 @@
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+#ifndef CONFIGS_H
+#define CONFIGS_H
 #include <string>
 #include <string_view>
+
+#define HTTP_SERVER
 
 namespace GTServer {
     namespace constants {
@@ -22,4 +24,4 @@ namespace GTServer {
     }
 }
 
-#endif // CONSTANTS_H
+#endif // CONFIGS_H
