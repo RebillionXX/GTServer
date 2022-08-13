@@ -57,7 +57,7 @@ namespace GTServer {
                 continue;
             switch(m_event.type) {
                 case ENET_EVENT_TYPE_CONNECT: {
-                    Player* player = new Player(m_event.peer, this);
+                    std::unique_ptr player = std::make_unique<GTServer::Player>(m_event.peer, this);
                     player->send({ NET_MESSAGE_SERVER_HELLO }, sizeof(TankUpdatePacket));
                     break;
                 }

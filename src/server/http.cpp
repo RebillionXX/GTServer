@@ -46,5 +46,6 @@ namespace GTServer {
         });
 
         m_server->listen_after_bind();
+        while(true);
     }
 }

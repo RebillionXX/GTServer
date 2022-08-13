@@ -20,7 +20,7 @@ namespace GTServer {
             }
             return true;
         }
-        bool deinitialize_enet() {
+        void deinitialize_enet() {
             enet_deinitialize();
         }
 
