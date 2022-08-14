@@ -14,14 +14,15 @@
 #include <server/server_pool.h>
 
 using namespace GTServer;
-database* g_database;
+Database* g_database;
+ItemDatabase* g_item_database;
 ServerPool* g_servers;
 event_manager* g_event_manager;
 
 int main() {
     fmt::print("starting GTServer version 0.0.2\n");
 #ifdef HTTP_SERVER
-    auto http_server{ std::make_unique<GTServer::http_server>(
+    auto http_server{ std::make_unique<HTTPServer>(
         std::string{ constants::http::address.begin(), constants::http::address.end() }, 
         constants::http::port
     ) };
@@ -34,7 +35,7 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    g_database = new database(
+    g_database = new Database(
     {
         constants::mysql::host,
         constants::mysql::username,
@@ -44,7 +45,8 @@ int main() {
     
     if (g_database->serialize_server_data(g_servers))
         fmt::print("   |-> server_data: [(user_identifier: {})]\n", g_servers->get_user_id(false));
-    fmt::print(" - items.dat serialization -> {}\n", item_database::instance().init() ? "succeed" : "failed");
+    g_item_database = new ItemDatabase();
+    fmt::print(" - items.dat serialization -> {}\n", g_item_database->serialize() ? "succeed" : "failed");
 
     fmt::print("initializing events manager\n"); {
         g_event_manager = new event_manager();

@@ -8,13 +8,13 @@
 
 namespace GTServer {
     class event_manager;
-    class database;
+    class Database;
     class PlayerPool;
     class Server {
     public:
         Server(const uint8_t& instanceId, const std::string& address, const uint16_t& port, const size_t& max_peers);
         ~Server();
-        void set_component(event_manager* ev, database* db);
+        void set_component(event_manager* ev, Database* db);
         
         std::pair<std::string, uint16_t> get_host();
         bool start();
@@ -42,6 +42,6 @@ namespace GTServer {
         std::shared_ptr<PlayerPool> m_player_pool;
     private:
         event_manager* m_event_manager;
-        database* m_database;
+        Database* m_database;
     };
 }

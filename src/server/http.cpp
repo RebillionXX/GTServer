@@ -4,30 +4,30 @@
 #include <proton/utils/text_scanner.h>
 
 namespace GTServer {
-    http_server::http_server(const std::string& host, const uint16_t& port)
+    HTTPServer::HTTPServer(const std::string& host, const uint16_t& port)
         : m_config{ std::make_pair(host, port) }
     {
         m_server = std::make_unique<httplib::SSLServer>("./cache/cert.pem", "./cache/key.pem"); 
     }
-    http_server::~http_server() { 
+    HTTPServer::~HTTPServer() { 
         this->stop(); 
     }
 
-    bool http_server::listen() {
-        fmt::print("starting http_server, binding ports.\n");
+    bool HTTPServer::listen() {
+        fmt::print("starting HTTPServer, binding ports.\n");
         if (!this->bind_to_port(m_config)) {
-            fmt::print(" - failed to bind http_server's port with {}.\n", m_config.second);
+            fmt::print(" - failed to bind HTTPServer's port with {}.\n", m_config.second);
             return false;
         }
-        std::thread(&http_server::thread, this).detach();
+        std::thread(&HTTPServer::thread, this).detach();
         return true; 
     }
-    void http_server::stop() { 
+    void HTTPServer::stop() { 
         m_server->stop();
         m_server.release();
     }
 
-    void http_server::thread() {
+    void HTTPServer::thread() {
         m_server->Post("/growtopia/server_data.php", [&](const httplib::Request& req, httplib::Response& res) {
             if (req.params.empty() || req.get_header_value("User-Agent").find("UbiServices_SDK") == std::string::npos) {
                 res.status = 403;

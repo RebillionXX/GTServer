@@ -13,7 +13,7 @@
 #include <utils/text.h>
 
 namespace GTServer {
-    class database {
+    class Database {
     public:
         typedef struct {
             std::string m_host;
@@ -34,8 +34,8 @@ namespace GTServer {
             BAD_CONNECTION
         };
     public:
-        explicit database(const database::settings& setting);
-        ~database();
+        explicit Database(const Database::settings& setting);
+        ~Database();
 
         bool init();
         sql::ResultSet* query(const std::string& query);
@@ -55,7 +55,7 @@ namespace GTServer {
         sql::Connection* m_connection;
         sql::Statement* m_statement;
 
-        database::settings m_settings;
+        Database::settings m_settings;
     };
 }
 

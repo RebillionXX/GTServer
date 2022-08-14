@@ -7,7 +7,7 @@
 #include <server/server.h>
 #include <proton/packet.h>
 namespace GTServer {
-    class database;
+    class Database;
     class event_manager {
     public:
         enum class text_event {
@@ -19,7 +19,7 @@ namespace GTServer {
             std::shared_ptr<Player> m_player;
             Server* m_server;
             event_manager* m_event_manager;
-            database* m_database;
+            Database* m_database;
 
             text_scanner m_parser;
         };

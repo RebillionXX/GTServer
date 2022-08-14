@@ -17,7 +17,7 @@ namespace GTServer {
             return;
         delete m_host;
     }
-    void Server::set_component(event_manager* ev, database* db) {
+    void Server::set_component(event_manager* ev, Database* db) {
         this->m_event_manager = ev;
         this->m_database = db;
     }

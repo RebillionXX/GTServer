@@ -2,18 +2,18 @@
 #include <database/database.h>
 
 namespace GTServer {
-    database::database(const database::settings& setting) : m_settings(setting) {
-        fmt::print("initializing database\n");
-        fmt::print(" - {} mysql server {}@{} -> {}\n", this->init() ? 
-            "connected to" : "failed to connect", 
+    Database::Database(const Database::settings& setting) : m_settings(setting) {
+        fmt::print("Initializing Database\n");
+        fmt::print(" - {} MySQL Server {}@{} -> {}\n", this->init() ? 
+            "Connected to" : "Failed to connect", 
         this->m_settings.m_host, this->m_settings.m_username, this->m_settings.m_schema);
     }
-    database::~database() {
+    Database::~Database() {
         if (!this->m_connection->isClosed())
             this->m_connection->close();
     }
     
-    bool database::init() {
+    bool Database::init() {
         try {
             m_driver = get_driver_instance();
             m_connection = m_driver->connect(
@@ -29,7 +29,7 @@ namespace GTServer {
             return false;
         }
     }
-    sql::ResultSet* database::query(const std::string& query) {
+    sql::ResultSet* Database::query(const std::string& query) {
         if (!m_connection->isValid())
             m_connection->reconnect();
         if (!m_connection || !m_connection->isValid())
@@ -38,7 +38,7 @@ namespace GTServer {
         return m_statement->executeQuery(query.c_str());
     }
 
-    bool database::serialize_server_data(ServerPool* sv_pool) {
+    bool Database::serialize_server_data(ServerPool* sv_pool) {
         sql::ResultSet* result = this->query("SELECT * FROM server_data");
         if (!result)
             return false;
@@ -50,14 +50,14 @@ namespace GTServer {
         return true;
     }
 
-    bool database::is_player_exist(const std::string& name) {
+    bool Database::is_player_exist(const std::string& name) {
         sql::ResultSet* result = this->query(fmt::format("SELECT * FROM `players` WHERE tank_id_name='{}' LIMIT 1", name));
         bool ret = (!result ? true : (result->rowsCount() > 0 ? true : false));
         delete result;
         return ret;
     }
 
-    std::pair<database::RegistrationResult, std::string> database::register_player(
+    std::pair<Database::RegistrationResult, std::string> Database::register_player(
         const std::string& name, 
         const std::string& password, 
         const std::string& verify_password, 

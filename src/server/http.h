@@ -6,10 +6,10 @@
 #include <httplib.h>
 
 namespace GTServer {
-    class http_server {
+    class HTTPServer {
     public:
-        explicit http_server(const std::string&, const uint16_t&);
-        ~http_server();
+        explicit HTTPServer(const std::string&, const uint16_t&);
+        ~HTTPServer();
 
         bool listen();
         void stop();

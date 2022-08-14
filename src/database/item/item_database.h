@@ -1,39 +1,33 @@
-#ifndef DATABASE_ITEM__ITEM_DATABASE_H
-#define DATABASE_ITEM__ITEM_DATABASE_H
-
+#pragma once
 #include <vector>
 #include <filesystem>
 
-#include <database/item/item.h>
+#include <database/item/item_info.h>
 #include <proton/packet.h>
 
 namespace GTServer
 {
-    class item_database
+    class ItemDatabase
     {
     public:
-        static item_database& instance() { static item_database items; return items; }
+        ItemDatabase();
+        ~ItemDatabase();
+        
+        bool serialize();
+        bool deserialize();
 
-        static bool init() { return instance().interface__init(); }
-
-        [[nodiscard]] uint32_t get_hash() const { return m_hash; }
     private:
-        item_database() = default;
-        ~item_database();
-
-        bool interface__init();
-    private:
-        uint32_t m_hash;
+        std::size_t m_size;
         char* m_data;
-        size_t m_data_size;
 
-        uint32_t m_item_count;
+        uint32_t m_hash;
         uint16_t m_version;
+        uint32_t m_item_count;
 
+        std::size_t m_packet_size;
         TankUpdatePacket* m_packet;
+
     private:
-        std::vector<item> m_items;
+        std::vector<ItemInfo*> m_items;
     };
 }
-
-#endif // DATABASE_ITEM__ITEM_DATABASE_H

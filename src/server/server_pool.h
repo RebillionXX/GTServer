@@ -7,7 +7,9 @@
 namespace GTServer {
     class ServerPool {
     public:
-        ServerPool() = default;
+        explicit ServerPool() {
+            fmt::print("Initializing ServerPool\n");
+        }
         ~ServerPool() = default;
 
         bool initialize_enet() {

@@ -19,9 +19,9 @@ namespace GTServer::events {
                     email{ ctx.m_parser.get("email", 1) },
                     discord{ ctx.m_parser.get("discord", 1) }
                 ;
-                const std::pair<database::RegistrationResult, std::string>& result = 
+                const std::pair<Database::RegistrationResult, std::string>& result = 
                     ctx.m_database->register_player(name, password, verify_password, email, discord);
-                if (result.first != database::RegistrationResult::SUCCESS) {
+                if (result.first != Database::RegistrationResult::SUCCESS) {
                     ctx.m_player->send_dialog(Player::dialog_type::REGISTRATION, text_scanner({ 
                         { "name", name }, 
                         { "password", password },
