@@ -50,7 +50,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/mysql/include
 )
 
-target_link_libraries(${PROJECT_NAME} 
+target_link_libraries(${PROJECT_NAME}
     enet
     fmt  
     ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/mysql/lib/libmysql.lib 

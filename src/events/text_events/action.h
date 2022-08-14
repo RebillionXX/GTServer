@@ -5,12 +5,11 @@
 
 namespace GTServer::events {
     void action(event_manager::context& ctx) {
-        text_scanner* parser = static_cast<text_scanner*>(ctx.m_data);
-        std::string action;
-        if (!parser->try_get("action", action))
+        if (ctx.m_parser.get("action").empty())
             return;
+        const std::string& action = ctx.m_parser.get("action", 1);
         if (!ctx.m_event_manager->call({ action, event_manager::text_event::ACTION }, ctx)) {
-            ctx.m_local->send_log(fmt::format("unhandled events::text_events::action: `waction`` -> `w{}``", action));
+            ctx.m_player->send_log("unhandled events::text_events::action: `waction`` -> `w{}``", action);
             return;
         }
     }

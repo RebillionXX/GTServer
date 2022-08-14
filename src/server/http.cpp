@@ -33,15 +33,13 @@ namespace GTServer {
                 res.status = 403;
                 return;
             }
-
             text_scanner parser{};
             parser.add("server", "127.0.0.1");
             parser.add<uint16_t>("port", 17091);
             parser.add<int>("type", 1);
             parser.add("#maint", "Server is under maintenance. We will be back online shortly. Thank you for your patience!");
-            parser.add<int>("type2", 1);
             parser.add("meta", "DIKHEAD");
-            res.set_content(fmt::format("{}\r\nRTENDMARKERBS1001\r\n", parser.get_all_raw()), "text/html");
+            res.set_content(std::string{ fmt::format("{}\nRTENDMARKERBS1001\n\n", parser.get_all_raw()) }, "text/html");
             return;
         });
 

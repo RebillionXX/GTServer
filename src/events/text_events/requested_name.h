@@ -6,38 +6,30 @@
 
 namespace GTServer::events {
     void requested_name(event_manager::context& ctx) {
-        text_scanner* parser = static_cast<text_scanner*>(ctx.m_data);
-        if (!parser->try_get<int32_t>("platformID", ctx.m_local->m_platform)) {
-            ctx.m_local->disconnect(0U);    
+        if (!ctx.m_parser.try_get<int32_t>("platformID", ctx.m_player->m_platform) ||
+            ctx.m_parser.get("meta", 1).empty() || ctx.m_parser.get("rid", 1).empty() || ctx.m_parser.get("mac", 1).empty()) {
+            ctx.m_player->disconnect(0U);    
             return;
         }
-        switch (ctx.m_local->m_platform) {
+        switch (ctx.m_player->m_platform) {
             case Player::PLATFORM_ID_WINDOWS: {
-                ctx.m_local->m_login_info = (void*)(new WindowsPlayer());
-                const auto& platform = static_cast<WindowsPlayer*>(ctx.m_local->m_login_info);
+                ctx.m_player->m_login_info = (void*)(new WindowsPlayer());
+                const auto& platform = static_cast<WindowsPlayer*>(ctx.m_player->m_login_info);
                 if (!(
-                    parser->try_get("fz", platform->m_fz) &&
-                    parser->try_get("wk", platform->m_wk) &&
-                    parser->try_get("zf", platform->m_zf)
+                    ctx.m_parser.try_get("fz", platform->m_fz) &&
+                    ctx.m_parser.try_get("wk", platform->m_wk) &&
+                    ctx.m_parser.try_get("zf", platform->m_zf)
                 )) {
-                    ctx.m_local->disconnect(0U);    
+                    ctx.m_player->disconnect(0U);    
                     return;
                 }
                 break;
             }
             default: { //todo more platform checks
-                ctx.m_local->disconnect(0U);    
+                ctx.m_player->disconnect(0U);    
                 return;
             }
         }
-        
-        ctx.m_local->send_dialog(Player::dialog_type::REGISTRATION, text_scanner
-        ({ 
-            { "name", "" }, 
-            { "password", "" },
-            { "verify_password", "" },
-            { "email", "" },
-            { "discord", "" }
-        }));
+        ctx.m_player->send_dialog(Player::dialog_type::REGISTRATION, text_scanner{});
     }
 }

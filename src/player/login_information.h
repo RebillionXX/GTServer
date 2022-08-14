@@ -1,5 +1,4 @@
-#ifndef PLAYER__LOGIN_INFORMATION_H
-#define PLAYER__LOGIN_INFORMATION_H
+#pragma once
 #include <string>
 #include <player/player.h>
 
@@ -8,7 +7,7 @@ namespace GTServer {
     {
     public:
         std::string m_fz;
-        std::string m_machine_hash;
+        std::string m_mac;
         std::string m_wk;
         std::string m_zf;
     };
@@ -18,7 +17,7 @@ namespace GTServer {
     public:
         std::string m_aid;
         std::string m_vid;
-        std::string m_machine_hash;
+        std::string m_mac;
     };
 
     class AndroidPlayer
@@ -28,5 +27,3 @@ namespace GTServer {
         std::string m_tr;
     };
 }
-
-#endif //PLAYER__LOGIN_INFORMATION_H

@@ -15,7 +15,7 @@
 
 using namespace GTServer;
 database* g_database;
-server_pool* g_servers;
+ServerPool* g_servers;
 event_manager* g_event_manager;
 
 int main() {
@@ -28,7 +28,7 @@ int main() {
     if (!http_server->listen())
         fmt::print("failed to starting http server, please run an external http service.\n");
 #endif
-    g_servers = new server_pool();
+    g_servers = new ServerPool();
     if (!g_servers->initialize_enet()) {
         fmt::print("failed to initialize enet, shutting down the server.\n");
         return EXIT_FAILURE;
@@ -53,7 +53,7 @@ int main() {
     }
 
     fmt::print("initializing server & starting threads\n"); {
-        server* server = g_servers->start_instance();
+        std::shared_ptr<Server> server{ g_servers->start_instance() };
         if (!server->start()) {
             fmt::print("failed to start enet server -> {}:{}", server->get_host().first, server->get_host().second);
             return EXIT_FAILURE;

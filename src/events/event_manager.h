@@ -16,12 +16,12 @@ namespace GTServer {
         };
 
         struct context {
-            Player* m_local;
-            server* m_server;
+            std::shared_ptr<Player> m_player;
+            Server* m_server;
             event_manager* m_event_manager;
             database* m_database;
 
-            void* m_data;
+            text_scanner m_parser;
         };
     public:
         event_manager();
