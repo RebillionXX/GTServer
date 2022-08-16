@@ -15,7 +15,7 @@ namespace GTServer {
     
     bool Database::init() {
         try {
-            m_driver = get_driver_instance();
+            m_driver = sql::mariadb::get_driver_instance();
             m_connection = m_driver->connect(
                 this->m_settings.m_host.c_str(), 
                 this->m_settings.m_username.c_str(), 

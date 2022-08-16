@@ -4,7 +4,7 @@
 #include <string>
 #include <istream>
 #include <fmt/core.h>
-#include <cppconn/resultset.h>
+#include <mariadb/conncpp.hpp>
 
 namespace GTServer
 {
