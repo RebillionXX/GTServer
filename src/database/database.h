@@ -1,12 +1,8 @@
 #ifndef DATABASE__DATABASE_H
 #define DATABASE__DATABASE_H
 #include <algorithm>
-#include <mysql_connection.h>
-#include <cppconn/driver.h>
-#include <cppconn/exception.h>
-#include <cppconn/resultset.h>
-#include <cppconn/statement.h>
-#include <cppconn/prepared_statement.h>
+#include <mariadb/conncpp.hpp>
+#include <mariadb/conncpp/Driver.hpp>
 #include <configs.h>
 #include <server/server_pool.h>
 #include <utils/mysql_result.h>

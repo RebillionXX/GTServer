@@ -47,15 +47,15 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/cpp-httplib/
     ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/enet/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/fmt/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/mysql/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/mariadb/include
 )
 
+find_package(OpenSSL REQUIRED)
 target_link_libraries(${PROJECT_NAME}
     enet
-    fmt  
-    ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/mysql/lib/libmysql.lib 
-    ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/mysql/lib/mysqlclient.lib 
-    ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/mysql/lib/mysqlcppconn.lib 
-    ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/mysql/lib/mysqlcppconn-static.lib 
-    ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/mysql/lib/mysqlservices.lib
+    fmt
+    OpenSSL::SSL OpenSSL::Crypto
+    ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/mariadb/mariadbcpp.lib
 )
+
+
