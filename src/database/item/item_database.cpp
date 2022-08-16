@@ -19,6 +19,7 @@ namespace GTServer {
         if (!std::filesystem::exists("utils/items.dat"))
             return false;
         uintmax_t data_size = std::filesystem::file_size("utils/items.dat");
+        m_size = data_size;
         m_data = (char*)std::malloc(data_size);
 
         std::ifstream file("utils/items.dat", std::ios::binary);
