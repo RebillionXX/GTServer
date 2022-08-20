@@ -22,7 +22,7 @@ To building this source, you would need to install these libraries:
 - [OpenSSL](https://github.com/openssl/openssl)
 - [fmt](https://github.com/fmtlib/fmt)
 - [enet](https://github.com/lsalzman/enet)
-- 
+
 ## How to clone the source
 ```
 $ git clone https://github.com/RebillionXX/GTServer.git
