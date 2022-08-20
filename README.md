@@ -19,8 +19,10 @@ a server made for growtopia private server -> [Growtopia](https://growtopiagame.
 
 ## Requirement
 To building this source, you would need to install these libraries:
-- [Boost](https://www.boost.org/) (You'll need x64 for this)
-
+- [OpenSSL](https://github.com/openssl/openssl)
+- [fmt](https://github.com/fmtlib/fmt)
+- [enet](https://github.com/lsalzman/enet)
+- 
 ## How to clone the source
 ```
 $ git clone https://github.com/RebillionXX/GTServer.git
@@ -30,14 +32,11 @@ $ git submodule update --init --recursive
 
 ## How to build the source - starting path (GTServer/)
 ```
-$ mkdir build
-$ cd build
-$ cmake ..
-$ cmake --build .
+$ build.bat
 ```
 
 ## Running the program
-- copy a executable file (`server.exe`) from `GTServer/build/src/debug` to `GTServer/bin`
+- copy all files `GTServer/build/src/debug` to `GTServer/bin`
 - run the program.
 
 ## Credits
