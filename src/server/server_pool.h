@@ -2,12 +2,16 @@
 #include <unordered_map>
 #include <string>
 #include <server/server.h>
+#include <server/load_balancer.h>
+#include <server/server_gateway.h>
 #include <fmt/chrono.h>
 
 namespace GTServer {
     class ServerPool {
     public:
-        explicit ServerPool() {
+        explicit ServerPool(std::shared_ptr<EventPool> events, std::shared_ptr<Database> database) :
+            m_events{ events },
+            m_database{ database } {
             fmt::print("Initializing ServerPool\n");
         }
         ~ServerPool() = default;
@@ -52,9 +56,11 @@ namespace GTServer {
         std::string m_address{ "0.0.0.0" };
         uint16_t m_port{ 17091 };
         size_t m_max_peers{ 0xFF };
-
         int user_id{ 0 };
+
     private:
+        std::shared_ptr<EventPool> m_events;
+        std::shared_ptr<Database> m_database;
         std::unordered_map<uint8_t, std::shared_ptr<Server>> m_servers{};
     };
 }

@@ -1,10 +1,9 @@
-#ifndef UTILS__TEXT_H
-#define UTILS__TEXT_H
+#pragma once
 #include <cctype>
 #include <regex>
 #include <string_view>
 
-namespace utils::text {
+namespace utils {
     inline bool is_valid_email(const std::string& val) {
         const std::regex pattern("(\\w+)(\\.|_)?(\\w*)@(\\w+)(\\.(\\w+))+");
         return std::regex_match(val, pattern); //https://www.codespeedy.com/program-to-validate-email-id-using-regex-in-cpp/
@@ -31,9 +30,10 @@ namespace utils::text {
             hash = ((hash << 5) + hash) + c;
         return hash;
     }
-    constexpr uint32_t operator "" _qh(const char* str, std::size_t len) {
-        return utils::text::quick_hash(std::string_view{ str, len });
-    }
 }
 
-#endif // UTILS__TEXT_H
+namespace GTServer {
+    constexpr uint32_t operator "" _qh(const char* str, std::size_t len) {
+        return utils::quick_hash(std::string_view{ str, len });
+    }
+}

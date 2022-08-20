@@ -16,8 +16,10 @@ namespace GTServer
         bool serialize();
         bool deserialize();
 
+        [[nodiscard]] uintmax_t get_hash() { return this->m_hash; }
+        [[nodiscard]] std::vector<ItemInfo*> get_items() { return this->m_items; }
     private:
-        std::size_t m_size;
+        uintmax_t m_size;
         char* m_data;
 
         uint32_t m_hash;

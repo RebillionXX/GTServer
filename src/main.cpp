@@ -8,16 +8,16 @@
 
 #include <database/database.h>
 #include <database/item/item_database.h>
-#include <events/event_manager.h>
+#include <event/event_pool.h>
 #include <server/http.h>
 #include <server/server.h>
 #include <server/server_pool.h>
 
 using namespace GTServer;
-Database* g_database;
-ItemDatabase* g_item_database;
-ServerPool* g_servers;
-event_manager* g_event_manager;
+std::shared_ptr<Database> g_database;
+std::shared_ptr<ItemDatabase> g_items;
+std::shared_ptr<ServerPool> g_servers;
+std::shared_ptr<EventPool> g_events;
 
 int main() {
     fmt::print("starting GTServer version 0.0.2\n");
@@ -29,39 +29,36 @@ int main() {
     if (!http_server->listen())
         fmt::print("failed to starting http server, please run an external http service.\n");
 #endif
-    g_servers = new ServerPool();
+    g_database = std::make_shared<Database>(
+        Database::Settings {
+            constants::mysql::host,
+            constants::mysql::username,
+            constants::mysql::password,
+            constants::mysql::schema
+        }
+    );
+
+    g_items = std::make_shared<ItemDatabase>();
+    if (!g_items->serialize())
+        fmt::print(" - failed to serialization items.dat\n");
+    else
+        fmt::print(" - items.dat -> {} items loaded with hash {}\n", g_items->get_items().size(), g_items->get_hash());
+
+    g_events = std::make_shared<EventPool>();
+    g_events->load_events();
+
+    g_servers = std::make_shared<ServerPool>(g_events, g_database);
     if (!g_servers->initialize_enet()) {
         fmt::print("failed to initialize enet, shutting down the server.\n");
         return EXIT_FAILURE;
     }
-
-    g_database = new Database(
-    {
-        constants::mysql::host,
-        constants::mysql::username,
-        constants::mysql::password,
-        constants::mysql::schema
-    });
     
-    if (g_database->serialize_server_data(g_servers))
-        fmt::print("   |-> server_data: [(user_identifier: {})]\n", g_servers->get_user_id(false));
-    g_item_database = new ItemDatabase();
-    fmt::print(" - items.dat serialization -> {}\n", g_item_database->serialize() ? "succeed" : "failed");
-
-    fmt::print("initializing events manager\n"); {
-        g_event_manager = new event_manager();
-        g_event_manager->load_events();
-        fmt::print(" - {} text events | {} action events | {} game packet events\n", g_event_manager->get_text_events(), g_event_manager->get_action_events(), g_event_manager->get_packet_events());
+    std::shared_ptr<Server> server{ g_servers->start_instance() };
+    if (!server->start()) {
+        fmt::print("failed to start enet server -> {}:{}", server->get_host().first, server->get_host().second);
+        return EXIT_FAILURE;
     }
-
-    fmt::print("initializing server & starting threads\n"); {
-        std::shared_ptr<Server> server{ g_servers->start_instance() };
-        if (!server->start()) {
-            fmt::print("failed to start enet server -> {}:{}", server->get_host().first, server->get_host().second);
-            return EXIT_FAILURE;
-        }
-        server->set_component(g_event_manager, g_database);
-        server->start_service();
-    }
+    server->set_component(g_events, g_database);
+    server->start_service();
     while(true);
 }

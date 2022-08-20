@@ -1,7 +1,7 @@
 #include <server/server.h>
 #include <fmt/core.h>
 #include <fmt/chrono.h>
-#include <events/event_manager.h>
+#include <event/event_pool.h>
 #include <player/player_pool.h>
 #include <proton/packet.h>
 #include <proton/utils/text_scanner.h>
@@ -17,9 +17,9 @@ namespace GTServer {
             return;
         delete m_host;
     }
-    void Server::set_component(event_manager* ev, Database* db) {
-        this->m_event_manager = ev;
-        this->m_database = db;
+    void Server::set_component(std::shared_ptr<EventPool> events, std::shared_ptr<Database> database) {
+        m_events = std::move(events);
+        m_database = std::move(database);
     }
 
     std::pair<std::string, uint16_t> Server::get_host() {
@@ -36,7 +36,7 @@ namespace GTServer {
         
         m_host->checksum = enet_crc32;
         enet_host_compress_with_range_coder(m_host);
-        fmt::print("starting instance_id: {}, {}:{} - {}\n", 1, m_address, m_port, std::chrono::system_clock::now());
+        fmt::print("starting instance_id: {}, {}:{} - {}\n", m_instance_id, m_address, m_port, std::chrono::system_clock::now());
         m_running.store(true);
         return true;
     }
@@ -100,17 +100,16 @@ namespace GTServer {
             case NET_MESSAGE_GENERIC_TEXT:
             case NET_MESSAGE_GAME_MESSAGE: {
                 const auto& str = utils::get_tank_update_data(m_event.packet);
-                event_manager::context ctx{ 
-                    player, 
-                    this, 
-                    m_event_manager, 
+                EventContext ctx{ 
+                    this,
+                    player,
                     m_database, 
                     text_scanner{ str } 
                 };
                 
-                std::string ev_function = str.substr(0, str.find('|'));
-                if (!m_event_manager->call({ ev_function, event_manager::text_event::TEXT }, ctx))
-                    break;
+                /*std::string ev_function = str.substr(0, str.find('|'));
+                if (!m_event_manager->call({ ev_function, EventPool::text_event::TEXT }, ctx))
+                    break;*/
                 break;
             }
             case NET_MESSAGE_GAME_PACKET: {

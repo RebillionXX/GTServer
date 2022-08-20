@@ -16,7 +16,7 @@ namespace GTServer {
             std::string m_username;
             std::string m_password;
             std::string m_schema;
-        } settings;
+        } Settings;
         
         enum class RegistrationResult {
             SUCCESS,
@@ -30,13 +30,11 @@ namespace GTServer {
             BAD_CONNECTION
         };
     public:
-        explicit Database(const Database::settings& setting);
+        Database(const Database::Settings& setting);
         ~Database();
 
         bool init();
         sql::ResultSet* query(const std::string& query);
-
-        bool serialize_server_data(ServerPool* sv_pool);
         
         bool is_player_exist(const std::string& name);
         std::pair<RegistrationResult, std::string> register_player(
@@ -51,7 +49,7 @@ namespace GTServer {
         sql::Connection* m_connection;
         sql::Statement* m_statement;
 
-        Database::settings m_settings;
+        Database::Settings m_settings;
     };
 }
 

@@ -1,29 +1,21 @@
 project(server LANGUAGES CXX)
 
+find_package(OpenSSL REQUIRED)
+find_package(fmt CONFIG REQUIRED)
+find_package(unofficial-enet CONFIG REQUIRED)
+
+find_path(CPP_HTTPLIB_INCLUDE_DIRS "httplib.h")
+
 file(GLOB INCLUDE_FILES
     *.h
-    database/*.h
-    database/item/*.h
-    events/*.h
-    events/text_events/*.h
-    events/text_events/action/*.h
-    player/*.h
-    proton/*.h
-    proton/utils/*.h
-    server/*.h
-    utils/*.h)
+    **/*.h
+    **/**/*.h
+    **/**/**/*.h)
 file(GLOB SOURCE_FILES
     *.cpp
-    database/*.cpp
-    database/item/*.cpp
-    events/*.cpp
-    events/text_events/*.cpp
-    events/text_events/action/*.cpp
-    player/*.cpp
-    proton/*.cpp
-    proton/utils/*.cpp
-    server/*.cpp
-    utils/*.cpp)
+    **/*.cpp
+    **/**/*.cpp
+    **/**/**/*.cpp)
 
 add_executable(${PROJECT_NAME}
     ${INCLUDE_FILES}
@@ -44,16 +36,13 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/cpp-httplib/
-    ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/enet/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/fmt/include
+    ${CPP_HTTPLIB_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/mariadb/include
 )
 
-find_package(OpenSSL REQUIRED)
 target_link_libraries(${PROJECT_NAME}
-    enet
-    fmt
+    unofficial::enet::enet
+    fmt::fmt
     OpenSSL::SSL OpenSSL::Crypto
     ${CMAKE_CURRENT_SOURCE_DIR}/../vendor/mariadb/mariadbcpp.lib
 )

@@ -2,7 +2,7 @@
 #include <database/database.h>
 
 namespace GTServer {
-    Database::Database(const Database::settings& setting) : m_settings(setting) {
+    Database::Database(const Database::Settings& setting) : m_settings(setting) {
         fmt::print("Initializing Database\n");
         fmt::print(" - {} MySQL Server {}@{} -> {}\n", this->init() ? 
             "Connected to" : "Failed to connect", 
@@ -38,18 +38,6 @@ namespace GTServer {
         return m_statement->executeQuery(query.c_str());
     }
 
-    bool Database::serialize_server_data(ServerPool* sv_pool) {
-        sql::ResultSet* result = this->query("SELECT * FROM server_data");
-        if (!result)
-            return false;
-        if (!result->next())
-            return false;
-        mysql_result res(result);
-        sv_pool->set_user_id(res.get_int("user_identifier"));
-        delete m_statement;
-        return true;
-    }
-
     bool Database::is_player_exist(const std::string& name) {
         sql::ResultSet* result = this->query(fmt::format("SELECT * FROM `players` WHERE tank_id_name='{}' LIMIT 1", name));
         bool ret = (!result ? true : (result->rowsCount() > 0 ? true : false));
@@ -74,13 +62,13 @@ namespace GTServer {
                 RegistrationResult::MISMATCH_VERIFY_PASSWORD,
                 "`4Oops!``  Passwords don't match.  Try again."
             };
-        if (!utils::text::is_valid_email(email) || !utils::text::is_valid_discord(discord))
+        if (!utils::is_valid_email(email) || !utils::is_valid_discord(discord))
             return {
                 RegistrationResult::INVALID_EMAIL_OR_DISCORD,
                 "`4Oops!``  Look, if you'd like to be able try retrieve your password if you lose it, you'd better enter a real email and discord id.  We promise to keep your data 100% private and never spam you."
             };
         std::string lower_case_name = name;
-        if (!utils::text::to_lowercase(lower_case_name))
+        if (!utils::to_lowercase(lower_case_name))
             return {
                 RegistrationResult::INVALID_GROWID,
                 "`4Oops!``  the name is includes invalid characters."
