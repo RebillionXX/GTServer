@@ -2,6 +2,7 @@
 
 a server made for growtopia private server -> [Growtopia](https://growtopiagame.com/).
 
+[server development discord](https://discord.gg/5BRwQVwvRq).
 ## Features
 - [x] readable&clean code
 - [x] https service provider
