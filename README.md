@@ -4,9 +4,10 @@ a server made for growtopia private server -> [Growtopia](https://growtopiagame.
 
 ## Features
 - [x] readable&clean code
-- [x] http service provider
-- [x] proper events manager
-- [x] MySQL connection
+- [x] https service provider
+- [x] MySQL Connection
+- [x] Working VariantList
+- [ ] Load Balancer and Server Gateway for sub-servers
 
 ## Todo
 - load more server requirement components (e.g. splicing data, items element, items buff/mods and many more)
