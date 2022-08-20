@@ -24,6 +24,13 @@ To building this source, you would need to install these libraries:
 - [fmt](https://github.com/fmtlib/fmt)
 - [enet](https://github.com/lsalzman/enet)
 
+## How to install libraries with vcpkg
+```
+$ vcpkg install openssl:x64-windows
+$ vcpkg install fmt:x64-windows
+$ vcpkg install enet:x64-windows
+```
+
 ## How to clone the source
 ```
 $ git clone https://github.com/RebillionXX/GTServer.git
