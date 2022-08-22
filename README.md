@@ -5,10 +5,14 @@ a server made for growtopia private server -> [Growtopia](https://growtopiagame.
 [server development discord](https://discord.gg/5BRwQVwvRq).
 ## Features
 - [x] readable&clean code
-- [x] https service provider
+- [x] HTTPS service provider
 - [x] MySQL Connection
 - [x] Working VariantList
 - [ ] Load Balancer and Server Gateway for sub-servers
+- [ ] EventQueue and LoginQueue
+- [ ] Guest account support
+- [ ] Login/Register
+- [ ] Caching for holding world offers
 
 ## Todo
 - load more server requirement components (e.g. splicing data, items element, items buff/mods and many more)
