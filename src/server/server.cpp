@@ -106,10 +106,10 @@ namespace GTServer {
                     m_database, 
                     text_scanner{ str } 
                 };
-                
-                /*std::string ev_function = str.substr(0, str.find('|'));
-                if (!m_event_manager->call({ ev_function, EventPool::text_event::TEXT }, ctx))
-                    break;*/
+
+                std::string event_data = str.substr(0, str.find('|'));
+                if (!m_events->execute(EVENT_TYPE_GENERIC_TEXT, event_data, ctx))
+                    break;
                 break;
             }
             case NET_MESSAGE_GAME_PACKET: {

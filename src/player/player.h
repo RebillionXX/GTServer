@@ -5,6 +5,7 @@
 #include <enet/enet.h>
 #include <fmt/core.h>
 #include <fmt/ranges.h>
+#include <player/login_information.h>
 #include <server/server.h>
 #include <proton/packet.h>
 #include <proton/variant.h>
@@ -52,6 +53,8 @@ namespace GTServer {
             const auto& data = fmt::format("action|log\nmsg|{}", std::vformat(format, std::make_format_args(args...)));
             this->send_packet(NET_MESSAGE_GAME_MESSAGE, data.data(), data.size());
         }
+
+        [[nodiscord]] std::shared_ptr<LoginInformation> get_login_info() { return m_login_info; }
     public:
         enum class dialog_type {
             REGISTRATION
@@ -89,7 +92,7 @@ namespace GTServer {
         }
     public:
         int32_t m_platform{ PLATFORM_ID_UNKNOWN };
-        void* m_login_info;
+        std::shared_ptr<LoginInformation> m_login_info;
 
         std::atomic<bool> m_logged_on;
     private:

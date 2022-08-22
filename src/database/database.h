@@ -1,23 +1,14 @@
-#ifndef DATABASE__DATABASE_H
-#define DATABASE__DATABASE_H
+#pragma once
 #include <algorithm>
-#include <mariadb/conncpp.hpp>
-#include <mariadb/conncpp/Driver.hpp>
-#include <configs.h>
+#include <sqlpp11/sqlpp11.h>
+#include <sqlpp11/mysql/mysql.h>
+#include <config.h>
 #include <server/server_pool.h>
-#include <utils/mysql_result.h>
 #include <utils/text.h>
 
 namespace GTServer {
     class Database {
-    public:
-        typedef struct {
-            std::string m_host;
-            std::string m_username;
-            std::string m_password;
-            std::string m_schema;
-        } Settings;
-        
+    public:  
         enum class RegistrationResult {
             SUCCESS,
             EXIST_GROWID,
@@ -29,28 +20,23 @@ namespace GTServer {
             MISMATCH_VERIFY_PASSWORD,
             BAD_CONNECTION
         };
-    public:
-        Database(const Database::Settings& setting);
-        ~Database();
 
-        bool init();
-        sql::ResultSet* query(const std::string& query);
+    public:
+        Database();
+        ~Database();
+        
+        bool connect();
         
         bool is_player_exist(const std::string& name);
         std::pair<RegistrationResult, std::string> register_player(
             const std::string& name, 
             const std::string& password, 
             const std::string& verify_password, 
-            const std::string& email, const 
-            std::string& discord
+            const std::string& email,
+            const std::string& discord
         );
-    private:
-        sql::Driver* m_driver;
-        sql::Connection* m_connection;
-        sql::Statement* m_statement;
 
-        Database::Settings m_settings;
+    private:
+        sqlpp::mysql::connection* m_connection;
     };
 }
-
-#endif // DATABASE__DATABASE_H

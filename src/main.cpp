@@ -23,20 +23,16 @@ int main() {
     fmt::print("starting GTServer version 0.0.2\n");
 #ifdef HTTP_SERVER
     auto http_server{ std::make_unique<HTTPServer>(
-        std::string{ constants::http::address.begin(), constants::http::address.end() }, 
-        constants::http::port
+        std::string{ config::http::address.begin(), config::http::address.end() }, 
+        config::http::port
     ) };
     if (!http_server->listen())
         fmt::print("failed to starting http server, please run an external http service.\n");
 #endif
-    g_database = std::make_shared<Database>(
-        Database::Settings {
-            constants::mysql::host,
-            constants::mysql::username,
-            constants::mysql::password,
-            constants::mysql::schema
-        }
-    );
+    g_database = std::make_shared<Database>();
+    if (!g_database->connect()) {
+        fmt::print(" - failed to connect MySQL server, please check server configuration.\n");
+    }
 
     g_items = std::make_shared<ItemDatabase>();
     if (!g_items->serialize())

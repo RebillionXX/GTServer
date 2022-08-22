@@ -32,13 +32,13 @@ namespace GTServer {
     }
 
     void EventPool::reg_generic(const std::string& ev, std::function<void(EventContext&)> fn) {
-        m_events[EVENT_TYPE_GENERIC_TEXT].push_back({ static_cast<uint64_t>(utils::quick_hash(ev)), fn });
+        m_events[EVENT_TYPE_GENERIC_TEXT].push_back({ static_cast<uint32_t>(utils::quick_hash(ev)), fn });
     }
     void EventPool::reg_action(const std::string& ev, std::function<void(EventContext&)> fn) {
-         m_events[EVENT_TYPE_ACTION].push_back({ static_cast<uint64_t>(utils::quick_hash(ev)), fn });
+         m_events[EVENT_TYPE_ACTION].push_back({ static_cast<uint32_t>(utils::quick_hash(ev)), fn });
     }
     void EventPool::reg_packet(const uint8_t& ev, std::function<void(EventContext&)> fn) {
-         m_events[EVENT_TYPE_GAME_PACKET].push_back({ static_cast<uint64_t>(ev), fn });
+         m_events[EVENT_TYPE_GAME_PACKET].push_back({ static_cast<uint32_t>(ev), fn });
     }
 
     std::size_t EventPool::get_registered_event(const EventType& type) const {

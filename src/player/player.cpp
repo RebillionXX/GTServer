@@ -1,7 +1,9 @@
 #include <player/player.h>
 
 namespace GTServer {
-    Player::Player(ENetPeer* peer) : m_peer(peer)
+    Player::Player(ENetPeer* peer) : 
+        m_peer(peer),
+        m_login_info{ std::make_shared<LoginInformation>() }
     {
         if(!m_peer)
             return;

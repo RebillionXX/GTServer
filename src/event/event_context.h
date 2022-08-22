@@ -7,7 +7,8 @@ namespace GTServer {
     enum EventType : uint8_t {
         EVENT_TYPE_GENERIC_TEXT,
         EVENT_TYPE_ACTION,
-        EVENT_TYPE_GAME_PACKET
+        EVENT_TYPE_GAME_PACKET,
+        TOTAL_EVENTS // used for EventQueue
     };
     struct EventContext {
         Server* m_server;

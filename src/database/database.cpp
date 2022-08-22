@@ -2,49 +2,41 @@
 #include <database/database.h>
 
 namespace GTServer {
-    Database::Database(const Database::Settings& setting) : m_settings(setting) {
+    Database::Database() : m_connection(nullptr) {
         fmt::print("Initializing Database\n");
-        fmt::print(" - {} MySQL Server {}@{} -> {}\n", this->init() ? 
-            "Connected to" : "Failed to connect", 
-        this->m_settings.m_host, this->m_settings.m_username, this->m_settings.m_schema);
+        sqlpp::mysql::global_library_init();
     }
     Database::~Database() {
-        if (!this->m_connection->isClosed())
-            this->m_connection->close();
     }
-    
-    bool Database::init() {
+
+    bool Database::connect() {
+        auto config = std::make_shared<sqlpp::mysql::connection_config>();
+        config->host = config::database::host;
+        config->port = config::database::port;
+        config->user = config::database::user;
+        config->password = config::database::password;
+        config->database = config::database::database;
+        config->auto_reconnect = config::database::auto_reconnect;
+        config->debug = config::database::debug;
+
         try {
-            m_driver = sql::mariadb::get_driver_instance();
-            m_connection = m_driver->connect(
-                this->m_settings.m_host.c_str(), 
-                this->m_settings.m_username.c_str(), 
-                this->m_settings.m_password.c_str()
-            );
-            if (!m_connection)
-                return false;
-            m_connection->setSchema(this->m_settings.m_schema.c_str());
-            return true;
-        } catch (const sql::SQLException& e) {
+            m_connection = new sqlpp::mysql::connection{ config };
+            fmt::print(" - connection configuration\n"
+            "  | host: {}\n"
+            "  | user: {}\n"
+            "  | database: {}\n", 
+            config->host,
+            config->user,
+            config->database);
+        }
+        catch (const sqlpp::exception &e) {
             return false;
         }
+        return true;
     }
-    sql::ResultSet* Database::query(const std::string& query) {
-        if (!m_connection->isValid())
-            m_connection->reconnect();
-        if (!m_connection || !m_connection->isValid())
-            return nullptr;
-        m_statement = m_connection->createStatement();
-        return m_statement->executeQuery(query.c_str());
-    }
-
     bool Database::is_player_exist(const std::string& name) {
-        sql::ResultSet* result = this->query(fmt::format("SELECT * FROM `players` WHERE tank_id_name='{}' LIMIT 1", name));
-        bool ret = (!result ? true : (result->rowsCount() > 0 ? true : false));
-        delete result;
-        return ret;
+        return true;
     }
-
     std::pair<Database::RegistrationResult, std::string> Database::register_player(
         const std::string& name, 
         const std::string& password, 
@@ -83,9 +75,8 @@ namespace GTServer {
                 RegistrationResult::EXIST_GROWID,
                 fmt::format("`4Oops!``  The name `w{}`` is so cool someone else has already taken it.  Please choose a different name.", name)
             };
-        if (!m_connection->isValid()) {
-            if (!m_connection->reconnect())
-                fmt::print("failed to reconnect database connection.\n");
+        if (!m_connection->is_valid()) {
+            m_connection->reconnect();
             return {
                 RegistrationResult::BAD_CONNECTION,
                 "`4Oops!``  Server's database had bad connection, please try again."
