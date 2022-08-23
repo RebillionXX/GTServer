@@ -4,12 +4,14 @@ file(GLOB INCLUDE_FILES
     *.h
     **/*.h
     **/**/*.h
-    **/**/**/*.h)
+    **/**/**/*.h
+    **/**/**/**/*.h)
 file(GLOB SOURCE_FILES
     *.cpp
     **/*.cpp
     **/**/*.cpp
-    **/**/**/*.cpp)
+    **/**/**/*.cpp
+    **/**/**/**/*.cpp)
 add_executable(${PROJECT_NAME}
     ${INCLUDE_FILES}
     ${SOURCE_FILES}

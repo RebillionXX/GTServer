@@ -14,7 +14,8 @@ namespace GTServer::events {
         }
         auto platform{ ctx.m_player->get_login_info() };
         platform->m_mac = ctx.m_parser.get("mac", 1);
-        
+        platform->m_rid = ctx.m_parser.get("rid", 1);
+
         switch (ctx.m_player->m_platform) {
             case Player::PLATFORM_ID_WINDOWS: {
                 if (!(
@@ -41,6 +42,9 @@ namespace GTServer::events {
                 return;
             }
         }
-        ctx.m_player->send_dialog(Player::dialog_type::REGISTRATION, text_scanner{});
+        
+        if (!ctx.m_player->load(ctx.m_database, true)) {
+            // create account
+        }
     }
 }

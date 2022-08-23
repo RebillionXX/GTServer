@@ -16,6 +16,7 @@ namespace GTServer {
         std::string m_aid{};
         std::string m_vid{};
         std::string m_gid{};
+        std::string m_rid{};
         std::string m_mac{};
     };
 }

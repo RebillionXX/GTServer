@@ -39,6 +39,7 @@ namespace GTServer {
             enet_peer_disconnect_later(this->get_peer(), data);
         }
 
+        bool load(std::shared_ptr<Database> db, const bool& guest);
         bool update_internet_protocol() {
             return enet_address_get_host_ip(&m_peer->address, m_ip_address.data(), 16) < 0 ? false : true;
         }
@@ -93,11 +94,18 @@ namespace GTServer {
     public:
         int32_t m_platform{ PLATFORM_ID_UNKNOWN };
         std::shared_ptr<LoginInformation> m_login_info;
-
         std::atomic<bool> m_logged_on;
+
     private:
         ENetPeer* m_peer;
 
-        std::string m_ip_address;
+        uint32_t m_user_id{ 0 };
+
+        std::string m_requested_name{};
+        std::string m_tank_id_name{};
+        std::string m_tank_id_pass{};
+        std::string m_raw_name{};
+        std::string m_display_name{};
+        std::string m_ip_address{};
     };
 }

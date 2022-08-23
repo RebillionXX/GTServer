@@ -1,4 +1,7 @@
 #include <player/player.h>
+#include <database/database.h>
+#include <sqlpp11/sqlpp11.h>
+#include <sqlpp11/mysql/mysql.h>
 
 namespace GTServer {
     Player::Player(ENetPeer* peer) : 
@@ -11,6 +14,29 @@ namespace GTServer {
 
         m_ip_address.reserve(16);
         enet_address_get_host_ip(&m_peer->address, m_ip_address.data(), 16);
+    }
+
+    bool Player::load(std::shared_ptr<Database> database, const bool& guest) {
+        try {
+            sqlpp::mysql::connection* db = database->get_connection();
+
+            if (guest) {
+                Account acc{};
+                for (const auto &row : (*db)(select(all_of(acc)).from(acc).where(acc.relative_identifier == m_login_info->m_rid))) {
+                    if (row._is_valid) {
+                        m_user_id = static_cast<uint32_t>(row.id);
+                        return true;
+                    }
+                }
+                fmt::print("[DEBUG]: Couldn't fetch account for {}\n", m_login_info->m_rid);
+                return false;
+            }
+            //todo registered account
+        }
+        catch(const std::exception &e) {
+            return false;
+        }
+        return false;
     }
 
     void Player::send_packet(TankUpdatePacket tank_packet, uintmax_t data_size) {

@@ -6,6 +6,9 @@
 #include <server/server_pool.h>
 #include <utils/text.h>
 
+//sqlpp database interface
+#include <database/interface/account_i.h>
+
 namespace GTServer {
     class Database {
     public:  
@@ -36,6 +39,9 @@ namespace GTServer {
             const std::string& discord
         );
 
+        sqlpp::mysql::connection* get_connection() {
+            return m_connection;
+        }
     private:
         sqlpp::mysql::connection* m_connection;
     };
