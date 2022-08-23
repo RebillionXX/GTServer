@@ -35,11 +35,17 @@ namespace GTServer {
         [[nodiscard]] ENetPeer* get_peer() const { return m_peer; }
         [[nodiscard]] const char* get_ip_address() const { return m_ip_address.data(); }
 
+        void set_user_id(const uint32_t& uid) {
+            m_user_id = uid;
+        }
+        [[nodiscard]] uint32_t get_user_id() const {
+            return m_user_id;
+        }
+        
         void disconnect(const enet_uint32& data) {
             enet_peer_disconnect_later(this->get_peer(), data);
         }
 
-        bool load(std::shared_ptr<Database> db, const bool& guest);
         bool update_internet_protocol() {
             return enet_address_get_host_ip(&m_peer->address, m_ip_address.data(), 16) < 0 ? false : true;
         }

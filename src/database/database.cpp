@@ -28,6 +28,8 @@ namespace GTServer {
             config->host,
             config->user,
             config->database);
+
+            m_player_table = new PlayerTable(m_connection);
         }
         catch (const sqlpp::exception &e) {
             return false;
@@ -83,5 +85,15 @@ namespace GTServer {
             };
         }
         return { RegistrationResult::SUCCESS, "" };
+    }
+
+    void* Database::get_table(const eDatabaseTable& table) {
+        switch (table) {
+            case DATABASE_PLAYER_TABLE:
+                return m_player_table;
+            default:
+                return nullptr;
+        }
+        return nullptr;
     }
 }

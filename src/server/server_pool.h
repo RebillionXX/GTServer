@@ -30,6 +30,14 @@ namespace GTServer {
         std::shared_ptr<Server> start_instance() {
             uint8_t instance_id = static_cast<uint8_t>(m_servers.size());
             m_servers[instance_id] = std::make_shared<Server>(++instance_id, m_address, m_port++, m_max_peers);
+
+            auto server{ m_servers[instance_id] };
+            server->set_component(this->m_events, this->m_database);
+            if (!server->start()) {
+                fmt::print("failed to start enet server -> {}:{}", server->get_host().first, server->get_host().second);
+                return nullptr;
+            }
+            fmt::print("starting instance_id: {}, {}:{} - {}\n", server->get_instance_id(), server->get_address(), server->get_port(), std::chrono::system_clock::now());
             return m_servers[instance_id];
         }
         void stop_instance(const uint8_t& instance_id) {

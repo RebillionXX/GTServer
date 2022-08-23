@@ -5,13 +5,14 @@
 #include <config.h>
 #include <server/server_pool.h>
 #include <utils/text.h>
-
-//sqlpp database interface
-#include <database/interface/account_i.h>
+#include <database/table/player_table.h>
 
 namespace GTServer {
     class Database {
-    public:  
+    public: 
+        enum eDatabaseTable {
+            DATABASE_PLAYER_TABLE
+        };
         enum class RegistrationResult {
             SUCCESS,
             EXIST_GROWID,
@@ -42,7 +43,9 @@ namespace GTServer {
         sqlpp::mysql::connection* get_connection() {
             return m_connection;
         }
+        void* get_table(const eDatabaseTable& table);
     private:
         sqlpp::mysql::connection* m_connection;
+        PlayerTable* m_player_table{ nullptr };
     };
 }

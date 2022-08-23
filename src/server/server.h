@@ -23,6 +23,9 @@ namespace GTServer {
         void start_service();
         void service();
     
+        [[nodiscard]] uint8_t get_instance_id() const { return m_instance_id; }
+        [[nodiscard]] std::string get_address() const { return m_address; }
+        [[nodiscard]] uint16_t get_port() const { return m_port; }
     public:
         void on_connect(ENetPeer* peer);
         void on_disconnect(ENetPeer* peer);

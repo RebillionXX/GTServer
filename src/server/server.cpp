@@ -36,7 +36,7 @@ namespace GTServer {
         
         m_host->checksum = enet_crc32;
         enet_host_compress_with_range_coder(m_host);
-        fmt::print("starting instance_id: {}, {}:{} - {}\n", m_instance_id, m_address, m_port, std::chrono::system_clock::now());
+        
         m_running.store(true);
         return true;
     }

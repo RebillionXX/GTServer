@@ -4,6 +4,8 @@
 #include <proton/utils/dialog_builder.h>
 #include <proton/utils/text_scanner.h>
 #include <player/login_information.h>
+#include <database/database.h>
+#include <database/table/player_table.h>
 
 namespace GTServer::events {
     void requested_name(EventContext& ctx) {
@@ -43,8 +45,13 @@ namespace GTServer::events {
             }
         }
         
-        if (!ctx.m_player->load(ctx.m_database, true)) {
-            // create account
+        PlayerTable* db = (PlayerTable*)ctx.m_database->get_table(Database::DATABASE_PLAYER_TABLE);
+        if (!db->load(ctx.m_player, true)) {
+            if (auto uid = db->insert(ctx.m_player); uid != 0) {
+                ctx.m_player->set_user_id(uid);
+                //TODO: db insert log
+            }
         }
+        //TODO: osm variantlist
     }
 }

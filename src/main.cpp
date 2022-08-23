@@ -50,11 +50,6 @@ int main() {
     }
     
     std::shared_ptr<Server> server{ g_servers->start_instance() };
-    if (!server->start()) {
-        fmt::print("failed to start enet server -> {}:{}", server->get_host().first, server->get_host().second);
-        return EXIT_FAILURE;
-    }
-    server->set_component(g_events, g_database);
     server->start_service();
     while(true);
 }
