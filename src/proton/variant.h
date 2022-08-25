@@ -82,7 +82,7 @@ namespace GTServer {
             return alloc;
         }
 
-        void pack(binary_writer& buffer) {
+        void pack(BinaryWriter& buffer) {
             buffer.write<uint8_t>((uint8_t)this->get_type());
 
             switch (this->get_type()) {
@@ -138,7 +138,7 @@ namespace GTServer {
             size_t alloc = 1;
             for(const auto& var : m_objects)
                 alloc += var.get_memory_allocate() + 1;
-            binary_writer buffer(alloc);
+            BinaryWriter buffer(alloc);
             buffer.write<uint8_t>(m_objects.size());
             for (size_t index = 0; index < m_objects.size(); index++) {
                 variant var = m_objects[index];

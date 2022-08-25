@@ -1,5 +1,6 @@
-#include <string>
 #include <database/database.h>
+#include <string>
+#include <utils/text.h>
 
 namespace GTServer {
     Database::Database() : m_connection(nullptr) {
@@ -30,6 +31,7 @@ namespace GTServer {
             config->database);
 
             m_player_table = new PlayerTable(m_connection);
+            m_player_tribute = new PlayerTribute();
         }
         catch (const sqlpp::exception &e) {
             return false;

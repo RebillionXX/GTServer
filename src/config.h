@@ -2,6 +2,7 @@
 #include <string>
 #include <string_view>
 
+#define SERVER_VERSION "0.1.0"
 #define HTTP_SERVER
 
 namespace GTServer {

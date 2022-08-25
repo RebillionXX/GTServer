@@ -1,11 +1,11 @@
 #pragma once
-#include <atomic>
 #include <format>
 #include <string>
 #include <enet/enet.h>
-#include <fmt/core.h>
-#include <fmt/ranges.h>
-#include <player/login_information.h>
+#include <player/structure/enums.h>
+#include <player/structure/login_information.h>
+#include <player/structure/roles.h>
+#include <player/structure/variantlist_sender.h>
 #include <server/server.h>
 #include <proton/packet.h>
 #include <proton/variant.h>
@@ -15,33 +15,29 @@
 namespace GTServer {
     class Player {
     public:
-        enum : int32_t {
-            PLATFORM_ID_UNKNOWN = -1,
-            PLATFORM_ID_WINDOWS,
-            PLATFORM_ID_IOS,
-            PLATFORM_ID_OSX,
-            PLATFORM_ID_LINUX,
-            PLATFORM_ID_ANDROID,
-            PLATFORM_ID_WINDOWS_MOBILE,
-            PLATFORM_ID_WEBOS,
-            PLATFORM_ID_BBX,
-            PLATFORM_ID_FLASH,
-            PLATFORM_ID_HTML5
-        };
-    public:
         explicit Player(ENetPeer* peer);
         ~Player() = default;
+
+        bool is_bit_on(const ePlayerBits& bits);
+        void set_bit(const ePlayerBits& bits);
+        void remove_bit(const ePlayerBits& bits);
 
         [[nodiscard]] ENetPeer* get_peer() const { return m_peer; }
         [[nodiscard]] const char* get_ip_address() const { return m_ip_address.data(); }
 
-        void set_user_id(const uint32_t& uid) {
-            m_user_id = uid;
+        void set_user_id(const uint32_t& uid) { m_user_id = uid; }
+        [[nodiscard]] uint32_t get_user_id() const { return m_user_id; }
+        void set_raw_name(const std::string& name) { m_raw_name = name; }
+        [[nodiscard]] std::string get_raw_name() const { return m_raw_name; }
+        [[nodiscard]] std::string get_display_name() const { 
+            char tag{}, color{ role_color[m_role] };
+            if (m_role >= PLAYER_ROLE_MODERATOR)
+                tag = char{ '@' };
+            return fmt::format("`{}{}{}``", color, tag == char{} ? "" : std::string{ 1, tag }, m_raw_name);
         }
-        [[nodiscard]] uint32_t get_user_id() const {
-            return m_user_id;
-        }
-        
+        void set_role(const uint32_t& role) { m_role = role; }
+        [[nodiscard]] uint32_t get_role() const { return m_role; }
+
         void disconnect(const enet_uint32& data) {
             enet_peer_disconnect_later(this->get_peer(), data);
         }
@@ -53,7 +49,6 @@ namespace GTServer {
         void send_packet(TankUpdatePacket tank_packet, uintmax_t data_size);
         void send_packet(TankUpdatePacket* tank_packet, uintmax_t data_size);
         void send_packet(int32_t type, const void* data, uintmax_t data_size);
-        void send_variant(const variantlist_t& var, int32_t delay = 0, int32_t net_id = -1);
         
         template <typename... Args>
         void send_log(const std::string& format, Args&&... args) {
@@ -63,20 +58,20 @@ namespace GTServer {
 
         [[nodiscord]] std::shared_ptr<LoginInformation> get_login_info() { return m_login_info; }
     public:
-        enum class dialog_type {
-            REGISTRATION
+        enum eDialogType {
+            DIALOG_TYPE_REGISTRATION
         };
-        void send_dialog(const dialog_type& type, text_scanner parser) {
+        void send_dialog(const eDialogType& type, text_scanner parser) {
             using namespace proton::utils;
             switch (type) {
-                case dialog_type::REGISTRATION: {
+                case DIALOG_TYPE_REGISTRATION: {
                     dialog_builder db{};
                     db.set_default_color('o')
                         ->add_label_with_icon("`wGTServer V0.0.1``", 0, dialog_builder::LEFT, dialog_builder::BIG)
                         ->add_spacer();
                     if (parser.contain("extra"))
                         db.add_textbox(parser.get("extra"))->add_spacer();
-                    db.add_textbox("By choosing a `wGrowID``, you can use a name and password to logon from any devide. Your`` name`` will be shown to other players!")
+                    db.add_textbox("By choosing a `wGrowID``, you can use a name and password to logon from any device. Your`` name`` will be shown to other players!")
                         ->add_text_input("name", "GrowID:", parser.get("name"), 18)
                         ->add_spacer()
                         ->add_textbox("Your `wpassword`` must contain`` 8 to 18 characters, 1 letter, 1 number`` and`` 1 special character: @#!$^&*.,``")
@@ -90,7 +85,7 @@ namespace GTServer {
                         ->add_textbox("We will never ask you for your password, email or discord, never share it with anyone!")
                         ->add_spacer()
                         ->end_dialog("growid", "Disconnect", "Create!");
-                    this->send_variant({ "OnDialogRequest", db.get() });
+                    v_sender.OnDialogRequest(db.get(), 0);
                     break;
                 }
                 default:
@@ -100,12 +95,14 @@ namespace GTServer {
     public:
         int32_t m_platform{ PLATFORM_ID_UNKNOWN };
         std::shared_ptr<LoginInformation> m_login_info;
-        std::atomic<bool> m_logged_on;
 
+        VariantListSender v_sender;
     private:
         ENetPeer* m_peer;
 
+        uint32_t m_bits{ 0 };
         uint32_t m_user_id{ 0 };
+        uint8_t m_role{ 0 };
 
         std::string m_requested_name{};
         std::string m_tank_id_name{};
@@ -113,5 +110,8 @@ namespace GTServer {
         std::string m_raw_name{};
         std::string m_display_name{};
         std::string m_ip_address{};
+
+        std::string m_email{};
+        std::string m_discord{};
     };
 }

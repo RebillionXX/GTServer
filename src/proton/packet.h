@@ -213,7 +213,7 @@ namespace GTServer {
         };
 
         uint32_t data_size = 0;
-        uint8_t data = 0;
+        uint8_t* data;
     };
     #pragma pack(pop)
 }

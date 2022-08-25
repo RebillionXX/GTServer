@@ -9,9 +9,10 @@
 namespace GTServer {
     class ServerPool {
     public:
-        explicit ServerPool(std::shared_ptr<EventPool> events, std::shared_ptr<Database> database) :
+        explicit ServerPool(std::shared_ptr<EventPool> events, std::shared_ptr<Database> database, std::shared_ptr<ItemDatabase> items) :
             m_events{ events },
-            m_database{ database } {
+            m_database{ database },
+            m_items{ items } {
             fmt::print("Initializing ServerPool\n");
         }
         ~ServerPool() = default;
@@ -32,7 +33,7 @@ namespace GTServer {
             m_servers[instance_id] = std::make_shared<Server>(++instance_id, m_address, m_port++, m_max_peers);
 
             auto server{ m_servers[instance_id] };
-            server->set_component(this->m_events, this->m_database);
+            server->set_component(m_events, m_database, m_items);
             if (!server->start()) {
                 fmt::print("failed to start enet server -> {}:{}", server->get_host().first, server->get_host().second);
                 return nullptr;
@@ -69,6 +70,7 @@ namespace GTServer {
     private:
         std::shared_ptr<EventPool> m_events;
         std::shared_ptr<Database> m_database;
+        std::shared_ptr<ItemDatabase> m_items;
         std::unordered_map<uint8_t, std::shared_ptr<Server>> m_servers{};
     };
 }

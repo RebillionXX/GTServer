@@ -7,6 +7,8 @@
 #include <event/text_events/requested_name.h>
 
 #include <event/text_events/action/dialog_return.h>
+#include <event/text_events/action/refresh_item_data.h>
+#include <event/text_events/action/refresh_player_tribute_data.h>
 
 namespace GTServer {
     EventPool::EventPool() {
@@ -21,6 +23,8 @@ namespace GTServer {
         reg_generic("action", events::action);
 
         reg_action("dialog_return", events::dialog_return);
+        reg_action("refresh_item_data", events::refresh_item_data);
+        reg_action("refresh_player_tribute_data", events::refresh_player_tribute_data);
 
         fmt::print(" - registered events, {} genetric texts {} actions {} game packets\n",
             this->get_registered_event(EVENT_TYPE_GENERIC_TEXT),

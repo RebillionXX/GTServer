@@ -1,26 +1,24 @@
-#ifndef UTILS__BINARY_WRITER_H
-#define UTILS__BINARY_WRITER_H
-
+#pragma once
 #include <string>
 #include <vector>
 
 namespace GTServer
 {
-    class binary_writer
+    class BinaryWriter
 	{
 	public:
-		binary_writer(uint8_t* data, size_t pos = 0) : m_data(data) {
+		BinaryWriter(uint8_t* data, size_t pos = 0) : m_data(data) {
 			this->m_pos = pos;
 			this->m_delete_after = false;
 		}
-		binary_writer(size_t len) {
+		BinaryWriter(size_t len) {
 			this->m_pos = 0;
 			this->m_len = len;
 
 			m_data = new uint8_t[len];
 			std::memset(m_data, 0, len);
 		}
-		~binary_writer() {
+		~BinaryWriter() {
 			if (this->m_delete_after)
 				delete[] m_data;
 		}
@@ -50,7 +48,10 @@ namespace GTServer
 			std::memcpy(m_data + m_pos + len_size, val.c_str(), len);
 			m_pos += len + len_size;
 		}
-
+		void write(const char* val, std::size_t len) {
+			std::memcpy(m_data + m_pos, val, len);
+			m_pos += len;
+		}
 		void skip(size_t len) {
 			this->m_pos += len;
 		}
@@ -72,5 +73,3 @@ namespace GTServer
 		bool m_delete_after{ true };
 	};
 }
-
-#endif // UTILS__BINARY_WRITER_H

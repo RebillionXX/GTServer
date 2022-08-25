@@ -1,6 +1,4 @@
-#ifndef UTILS__BINARY_READER_H
-#define UTILS__BINARY_READER_H
-
+#pragma once
 #include <string>
 #include <vector>
 
@@ -42,4 +40,3 @@ namespace GTServer
 		uint32_t m_pos;
 	};
 };
-#endif // UTILS__BINARY_READER_H

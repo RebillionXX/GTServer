@@ -7,7 +7,7 @@
 #include <proton/utils/misc_utils.h>
 
 namespace GTServer {
-    ItemDatabase::ItemDatabase() : m_size{}, m_hash{}, m_version{}, m_item_count{}, m_packet_size{} {}
+    ItemDatabase::ItemDatabase() : m_size{}, m_hash{}, m_version{}, m_item_count{} {}
     ItemDatabase::~ItemDatabase() {
         for (auto item : m_items)
             delete item;
@@ -20,7 +20,7 @@ namespace GTServer {
         if (!std::filesystem::exists("utils/items.dat"))
             return false;
         m_size = std::filesystem::file_size("utils/items.dat");
-        m_data = (char*)std::malloc(m_size);
+        m_data = static_cast<uint8_t*>(std::malloc(m_size));
 
         std::ifstream file("utils/items.dat", std::ios::binary);
         if (file.bad())
@@ -50,13 +50,13 @@ namespace GTServer {
         m_packet->data = static_cast<char*>(std::malloc(sizeof(GameUpdatePacket) + m_size));
 
         GameUpdatePacket* update_packet = reinterpret_cast<GameUpdatePacket*>(m_packet->data);
+        std::memset(update_packet, 0, sizeof(GameUpdatePacket) + m_size);
         update_packet->type = NET_GAME_PACKET_SEND_ITEM_DATABASE_DATA;
         update_packet->net_id = -1;
         update_packet->flags |= NET_GAME_PACKET_FLAGS_EXTENDED;
         update_packet->data_size = (uint32_t)m_size;
         std::memcpy(&update_packet->data, m_data, m_size);
         std::memcpy(&m_packet->data, update_packet, sizeof(GameUpdatePacket) + m_size);
-        free(update_packet);
         return true;
     }
 }

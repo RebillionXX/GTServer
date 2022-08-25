@@ -205,6 +205,26 @@ namespace GTServer {
 
             using _traits = ::sqlpp::make_traits<::sqlpp::varchar>;
         };
+
+        struct Role {
+            struct _alias_t {
+                static constexpr const char _literal[] = "role";
+                using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
+                template <typename T>
+                struct _member_t {
+                    T role;
+                    T& operator()() {
+                        return role;
+                    }
+
+                    const T& operator()() const {
+                        return role;
+                    }
+                };
+            };
+
+            using _traits = ::sqlpp::make_traits<::sqlpp::integer>;
+        };
     }
 
     struct Account 
@@ -218,7 +238,8 @@ namespace GTServer {
         account_i::Email, 
         account_i::Discord, 
         account_i::RelativeIdentifier,
-        account_i::MachineAddress> {
+        account_i::MachineAddress,
+        account_i::Role> {
         struct _alias_t {
             static constexpr const char _literal[] = "players";
             using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;

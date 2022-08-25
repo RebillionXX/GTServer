@@ -1,10 +1,9 @@
-#ifndef PROTON_UTILS__MISC_UTILS_H
-#define PROTON_UTILS__MISC_UTILS_H
+#pragma once
 #include <stdint.h>
 #include <string>
 
 namespace proton::utils {
-    uint32_t hash(const char *data, int32_t len) {
+    inline uint32_t hash(const char *data, int32_t len) {
         if (!data) return 0;
         unsigned char *n = (unsigned char*)data;
         uint32_t acc = 0x55555555;
@@ -19,5 +18,3 @@ namespace proton::utils {
         return acc;
     }
 };
-
-#endif // PROTON_UTILS__MISC_UTILS_H

@@ -17,9 +17,10 @@ namespace GTServer {
             return;
         delete m_host;
     }
-    void Server::set_component(std::shared_ptr<EventPool> events, std::shared_ptr<Database> database) {
+    void Server::set_component(std::shared_ptr<EventPool> events, std::shared_ptr<Database> database, std::shared_ptr<ItemDatabase> items) {
         m_events = std::move(events);
         m_database = std::move(database);
+        m_items = std::move(items);
     }
 
     std::pair<std::string, uint16_t> Server::get_host() {
@@ -104,6 +105,8 @@ namespace GTServer {
                     this,
                     player,
                     m_database, 
+                    m_items,
+                    m_events,
                     text_scanner{ str } 
                 };
 

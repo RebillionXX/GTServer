@@ -4,7 +4,7 @@
 #include <sqlpp11/mysql/mysql.h>
 #include <config.h>
 #include <server/server_pool.h>
-#include <utils/text.h>
+#include <database/player_tribute.h>
 #include <database/table/player_table.h>
 
 namespace GTServer {
@@ -43,9 +43,13 @@ namespace GTServer {
         sqlpp::mysql::connection* get_connection() {
             return m_connection;
         }
+        PlayerTribute* get_tribute() {
+            return m_player_tribute;
+        }
         void* get_table(const eDatabaseTable& table);
     private:
         sqlpp::mysql::connection* m_connection;
+        PlayerTribute* m_player_tribute{ nullptr };
         PlayerTable* m_player_table{ nullptr };
     };
 }
