@@ -17,10 +17,10 @@ namespace GTServer
         bool deserialize();
 
         [[nodiscard]] uint32_t get_hash() const { return m_hash; }
-        [[nodiscard]] std::pair<uintmax_t, TankUpdatePacket*> get_packet() const { return { m_size, m_packet }; }
+        [[nodiscard]] std::pair<std::size_t, TankUpdatePacket*> get_packet() const { return { m_size, m_packet }; }
         [[nodiscard]] std::vector<ItemInfo*> get_items() { return this->m_items; }
     private:
-        uintmax_t m_size;
+        std::size_t m_size;
         uint8_t* m_data;
 
         uint32_t m_hash;

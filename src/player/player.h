@@ -2,10 +2,10 @@
 #include <format>
 #include <string>
 #include <enet/enet.h>
-#include <player/structure/enums.h>
-#include <player/structure/login_information.h>
-#include <player/structure/roles.h>
-#include <player/structure/variantlist_sender.h>
+#include <player/objects/enums.h>
+#include <player/objects/login_information.h>
+#include <player/objects/roles.h>
+#include <player/objects/variantlist_sender.h>
 #include <server/server.h>
 #include <proton/packet.h>
 #include <proton/variant.h>
@@ -16,11 +16,11 @@ namespace GTServer {
     class Player {
     public:
         explicit Player(ENetPeer* peer);
-        ~Player() = default;
+        ~Player();
 
-        bool is_bit_on(const ePlayerBits& bits);
-        void set_bit(const ePlayerBits& bits);
-        void remove_bit(const ePlayerBits& bits);
+        bool is_flag_on(const ePlayerFlags& bits);
+        void set_flag(const ePlayerFlags& bits);
+        void remove_flag(const ePlayerFlags& bits);
 
         [[nodiscard]] ENetPeer* get_peer() const { return m_peer; }
         [[nodiscard]] const char* get_ip_address() const { return m_ip_address.data(); }
@@ -62,12 +62,11 @@ namespace GTServer {
             DIALOG_TYPE_REGISTRATION
         };
         void send_dialog(const eDialogType& type, text_scanner parser) {
-            using namespace proton::utils;
             switch (type) {
                 case DIALOG_TYPE_REGISTRATION: {
-                    dialog_builder db{};
+                    DialogBuilder db{};
                     db.set_default_color('o')
-                        ->add_label_with_icon("`wGTServer V0.0.1``", 0, dialog_builder::LEFT, dialog_builder::BIG)
+                        ->add_label_with_icon("`wGTServer V0.0.1``", 0, DialogBuilder::LEFT, DialogBuilder::BIG)
                         ->add_spacer();
                     if (parser.contain("extra"))
                         db.add_textbox(parser.get("extra"))->add_spacer();
@@ -100,7 +99,7 @@ namespace GTServer {
     private:
         ENetPeer* m_peer;
 
-        uint32_t m_bits{ 0 };
+        uint32_t m_flags{ 0 };
         uint32_t m_user_id{ 0 };
         uint8_t m_role{ 0 };
 

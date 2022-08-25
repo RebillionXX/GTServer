@@ -1,10 +1,9 @@
 #pragma once
 #include <event/event_pool.h>
-#include <event/event_pool.h>
 
 namespace GTServer::events {
     void action(EventContext& ctx) {
-        if (!ctx.m_player->is_bit_on(PLAYER_BIT_LOGGED_ON) ||
+        if (!ctx.m_player->is_flag_on(PLAYER_FLAG_LOGGED_ON) ||
             ctx.m_parser.get("action").empty())
             return;
         const std::string& action = ctx.m_parser.get("action", 1);

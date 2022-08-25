@@ -3,6 +3,7 @@
 #include <fmt/chrono.h>
 #include <event/event_pool.h>
 #include <player/player_pool.h>
+#include <world/world_pool.h>
 #include <proton/packet.h>
 #include <proton/utils/text_scanner.h>
 #include <utils/packet.h>
@@ -10,7 +11,8 @@
 namespace GTServer {
     Server::Server(const uint8_t& instanceId, const std::string& address, const uint16_t& port, const size_t& max_peers) : 
         m_instance_id(instanceId), m_address(address), m_port(port), m_max_peers(max_peers),
-        m_player_pool{ std::make_shared<PlayerPool>() } {
+        m_player_pool{ std::make_shared<PlayerPool>() },
+        m_world_pool{ std::make_shared<WorldPool>() } {
     }
     Server::~Server() {
         if(!this->stop())
@@ -86,7 +88,17 @@ namespace GTServer {
         player->send_packet({ NET_MESSAGE_SERVER_HELLO }, sizeof(TankUpdatePacket));
     }
     void Server::on_disconnect(ENetPeer* peer) {
+        if (!peer->data)
+            true;
+
+        std::uint32_t connect_id{};
+        std::memcpy(&connect_id, peer->data, sizeof(std::uint32_t));
+        std::free(peer->data);
+        peer->data = NULL;
         
+        if (!m_player_pool->get_player(connect_id))
+            return;
+        m_player_pool->remove_player(connect_id);
     }
     void Server::on_receive(ENetPeer* peer, ENetPacket* packet) {
         std::shared_ptr<Player> player{ m_player_pool->get_player(peer->connectID) };

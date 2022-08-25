@@ -45,15 +45,15 @@ namespace GTServer {
         };
 
         m_size = sizeof(uint32_t) + epic_players.length() + exceptional_mentors.length();
-        m_data = static_cast<uint8_t*>(std::malloc(m_size));
+        m_data = static_cast<char*>(std::malloc(m_size));
 
-        BinaryWriter buffer{ m_data };
+        BinaryWriter buffer{ reinterpret_cast<uint8_t*>(m_data) };
         buffer.write<uint16_t>(static_cast<uint16_t>(epic_players.length()));
         buffer.write(epic_players.c_str(), epic_players.length());
         buffer.write<uint16_t>(static_cast<uint16_t>(exceptional_mentors.length()));
         buffer.write(exceptional_mentors.c_str(), exceptional_mentors.length());
 
-        m_hash = proton::utils::hash(reinterpret_cast<char*>(m_data), static_cast<int32_t>(m_size));
+        m_hash = proton::utils::hash(m_data, m_size);
         m_packet = static_cast<TankUpdatePacket*>(std::malloc(sizeof(TankUpdatePacket) + sizeof(GameUpdatePacket) + m_size));
         std::memset(m_packet, 0, sizeof(TankUpdatePacket) + sizeof(GameUpdatePacket) + m_size);
         m_packet->type = NET_MESSAGE_GAME_PACKET;

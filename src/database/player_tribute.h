@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <list>
-#include <player/structure/roles.h>
+#include <player/objects/roles.h>
 
 namespace GTServer {
     class TankUpdatePacket;
@@ -20,8 +20,8 @@ namespace GTServer {
         [[nodiscard]] uint32_t get_hash() const { return m_hash; }
         [[nodiscard]] std::pair<std::size_t, TankUpdatePacket*> get_packet() const { return { m_size, m_packet }; }
     private:      
-        uintmax_t m_size;
-        uint8_t* m_data;
+        std::size_t m_size;
+        char* m_data;
 
         uint32_t m_hash;
         TankUpdatePacket* m_packet;

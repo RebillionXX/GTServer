@@ -2,8 +2,8 @@
 #include <event/event_pool.h>
 #include <proton/utils/text_scanner.h>
 #include <utils/random.h>
-#include <player/structure/enums.h>
-#include <player/structure/login_information.h>
+#include <player/objects/enums.h>
+#include <player/objects/login_information.h>
 #include <database/database.h>
 #include <database/table/player_table.h>
 
@@ -14,7 +14,7 @@ namespace GTServer::events {
             ctx.m_parser.get("rid", 1).empty() || 
             ctx.m_parser.get("mac", 1).empty() ||
             ctx.m_parser.get("requestedName", 1).empty() ||
-            ctx.m_player->is_bit_on(PLAYER_BIT_LOGGED_ON)) {
+            ctx.m_player->is_flag_on(PLAYER_FLAG_LOGGED_ON)) {
             ctx.m_player->disconnect(0U);
             return;
         }
@@ -61,7 +61,7 @@ namespace GTServer::events {
             ctx.m_player->set_user_id(uid);
         }
 
-        ctx.m_player->set_bit(PLAYER_BIT_LOGGED_ON);
+        ctx.m_player->set_flag(PLAYER_FLAG_LOGGED_ON);
         fmt::print("{} has logged on.\n", ctx.m_player->get_raw_name());
         ctx.m_player->v_sender.OnSuperMainStart(
             ctx.m_items->get_hash(),

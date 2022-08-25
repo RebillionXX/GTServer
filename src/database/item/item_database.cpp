@@ -12,6 +12,7 @@ namespace GTServer {
         for (auto item : m_items)
             delete item;
         m_items.clear();
+
         std::free(m_data);
         std::free(m_packet);
     }
@@ -19,17 +20,20 @@ namespace GTServer {
     bool ItemDatabase::serialize() {
         if (!std::filesystem::exists("utils/items.dat"))
             return false;
-        m_size = std::filesystem::file_size("utils/items.dat");
-        m_data = static_cast<uint8_t*>(std::malloc(m_size));
-
-        std::ifstream file("utils/items.dat", std::ios::binary);
-        if (file.bad())
+        std::ifstream file{ "utils/items.dat", std::ifstream::in | std::ifstream::binary };
+        if (!file.is_open())
             return false;
+
+        m_size = file.seekg(0, std::ios::end).tellg();
+        m_data = (uint8_t*)std::malloc(m_size);
+
+        file.seekg(0, std::ios::beg);
         file.read(reinterpret_cast<char*>(m_data), static_cast<std::streamsize>(m_size));
         file.close();
-        m_hash = proton::utils::hash(reinterpret_cast<char*>(m_data), static_cast<int32_t>(m_size));
 
-        BinaryReader br(reinterpret_cast<uint8_t*>(m_data));
+        m_hash = proton::utils::hash(m_data, m_size);
+
+        BinaryReader br{ m_data };
         m_version = br.read<uint16_t>();
         m_item_count = br.read<uint32_t>();
 

@@ -11,22 +11,26 @@ namespace GTServer {
     {
         if(!m_peer)
             return;
-        m_peer->data = this;
+        m_peer->data = std::malloc(sizeof(uint32_t));
+        std::memcpy(m_peer->data, &m_peer->connectID, sizeof(uint32_t));
 
         m_ip_address.reserve(16);
         enet_address_get_host_ip(&m_peer->address, m_ip_address.data(), 16);
     }
+    Player::~Player() {
+        m_login_info.reset();
+    }
 
-    bool Player::is_bit_on(const ePlayerBits& bits) {
-        if (m_bits & bits)
+    bool Player::is_flag_on(const ePlayerFlags& bits) {
+        if (m_flags & bits)
             return true;
         return false;
     }
-    void Player::set_bit(const ePlayerBits& bits) {
-        m_bits |= bits;
+    void Player::set_flag(const ePlayerFlags& bits) {
+        m_flags |= bits;
     }
-    void Player::remove_bit(const ePlayerBits& bits) {
-        m_bits &= ~bits;
+    void Player::remove_flag(const ePlayerFlags& bits) {
+        m_flags &= ~bits;
     }
 
     void Player::send_packet(TankUpdatePacket tank_packet, uintmax_t data_size) {

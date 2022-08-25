@@ -69,6 +69,12 @@ namespace GTServer {
                 data
             }, delay);
         }
+        void OnRequestWorldSelectMenu(const std::string& data, int32_t delay = 0) {
+            this->send({
+                "OnRequestWorldSelectMenu",
+                data
+            }, delay);
+        }
     private:
         ENetPeer* m_peer;
     };

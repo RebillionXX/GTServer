@@ -56,6 +56,7 @@ namespace GTServer {
                     if (row._is_valid) {
                         player->set_user_id(static_cast<uint32_t>(row.id));
                         player->set_raw_name(row.raw_name);
+                        player->set_role(row.role);
                         return true;
                     }
                 }
