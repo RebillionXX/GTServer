@@ -1,5 +1,5 @@
-#ifndef PROTON_UTILS__COMMON_H
-#define PROTON_UTILS__COMMON_H
+#pragma once
+#include <string>
 
 namespace GTServer {
     typedef struct _CL_Vec2f {
@@ -266,4 +266,3 @@ namespace GTServer {
         }
     } CL_Recti;
 }
-#endif // PROTON_UTILS__COMMON_H

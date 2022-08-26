@@ -1,0 +1,22 @@
+#pragma once
+
+namespace GTServer {
+    enum eItemComponent {
+        ITEM_BLANK = 0,
+		ITEM_BLANK_SEED = 1,
+		ITEM_DIRT = 2,
+		ITEM_DIRT_SEED = 3,
+		ITEM_LAVA = 4,
+		ITEM_LAVA_SEED = 5,
+		ITEM_MAIN_DOOR = 6,
+		ITEM_MAIN_DOOR_SEED = 7,
+		ITEM_BEDROCK = 8,
+		ITEM_BEDROCK_SEED = 9,
+		ITEM_ROCK = 10,
+		ITEM_ROCK_SEED = 11,
+		ITEM_DOOR = 12,
+		ITEM_DOOR_SEED = 13,
+		ITEM_CAVE_BACKGROUND = 14,
+		ITEM_CAVE_BACKGROUND_SEED = 15
+    };
+}

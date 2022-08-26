@@ -48,6 +48,10 @@ namespace GTServer
 			std::memcpy(m_data + m_pos + len_size, val.c_str(), len);
 			m_pos += len + len_size;
 		}
+		void write(const uint8_t* val, std::size_t len) {
+			std::memcpy(m_data + m_pos, val, len);
+			m_pos += len;
+		}
 		void write(const char* val, std::size_t len) {
 			std::memcpy(m_data + m_pos, val, len);
 			m_pos += len;

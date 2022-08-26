@@ -38,6 +38,11 @@ namespace GTServer {
         void set_role(const uint32_t& role) { m_role = role; }
         [[nodiscard]] uint32_t get_role() const { return m_role; }
 
+        void set_world(const std::string& name) { m_world = name; }
+        [[nodiscard]] std::string get_world() const { return m_world; }
+        void set_net_id(const uint32_t& net_id) { m_net_id = net_id; }
+        [[nodiscard]] uint32_t get_net_id() const { return m_net_id; }
+
         void disconnect(const enet_uint32& data) {
             enet_peer_disconnect_later(this->get_peer(), data);
         }
@@ -61,36 +66,8 @@ namespace GTServer {
         enum eDialogType {
             DIALOG_TYPE_REGISTRATION
         };
-        void send_dialog(const eDialogType& type, text_scanner parser) {
-            switch (type) {
-                case DIALOG_TYPE_REGISTRATION: {
-                    DialogBuilder db{};
-                    db.set_default_color('o')
-                        ->add_label_with_icon("`wGTServer V0.0.1``", 0, DialogBuilder::LEFT, DialogBuilder::BIG)
-                        ->add_spacer();
-                    if (parser.contain("extra"))
-                        db.add_textbox(parser.get("extra"))->add_spacer();
-                    db.add_textbox("By choosing a `wGrowID``, you can use a name and password to logon from any device. Your`` name`` will be shown to other players!")
-                        ->add_text_input("name", "GrowID:", parser.get("name"), 18)
-                        ->add_spacer()
-                        ->add_textbox("Your `wpassword`` must contain`` 8 to 18 characters, 1 letter, 1 number`` and`` 1 special character: @#!$^&*.,``")
-                        ->add_text_input_password("password", "Password:", parser.get("password"), 18)
-                        ->add_text_input_password("verify_password", "Verify Password:", parser.get("verify_password"), 18)
-                        ->add_spacer()
-                        ->add_textbox("Your `wemail address `owill only be used for account verification purposes and won't be spammed or shared. If you use a fake email, you'll never be able to recover or change your password.")
-                        ->add_text_input("email", "Email:", parser.get("email"), 25)
-                        ->add_textbox("Your `wDiscord ID `owill be used for secondary verification if you lost access to your `wemail address`o! Please enter in such format: `wdiscordname#tag`o. Your `wDiscord Tag `ocan be found in your `wDiscord account settings`o.")
-                        ->add_text_input("discord", "Discord:", parser.get("discord"), 25)
-                        ->add_textbox("We will never ask you for your password, email or discord, never share it with anyone!")
-                        ->add_spacer()
-                        ->end_dialog("growid", "Disconnect", "Create!");
-                    v_sender.OnDialogRequest(db.get(), 0);
-                    break;
-                }
-                default:
-                    break;
-            }
-        }
+        void send_dialog(const eDialogType& type, text_scanner parser);
+        
     public:
         int32_t m_platform{ PLATFORM_ID_UNKNOWN };
         std::shared_ptr<LoginInformation> m_login_info;
@@ -112,5 +89,8 @@ namespace GTServer {
 
         std::string m_email{};
         std::string m_discord{};
+
+        std::string m_world{ "EXIT" };
+        uint32_t m_net_id{ 0 };
     };
 }

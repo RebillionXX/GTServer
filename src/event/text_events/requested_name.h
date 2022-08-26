@@ -1,4 +1,5 @@
 #pragma once
+#include <regex>
 #include <event/event_pool.h>
 #include <proton/utils/text_scanner.h>
 #include <utils/random.h>
@@ -15,6 +16,14 @@ namespace GTServer::events {
             ctx.m_parser.get("mac", 1).empty() ||
             ctx.m_parser.get("requestedName", 1).empty() ||
             ctx.m_player->is_flag_on(PLAYER_FLAG_LOGGED_ON)) {
+            ctx.m_player->disconnect(0U);
+            return;
+        }
+        ctx.m_player->set_raw_name(ctx.m_parser.get("requestedName", 1));
+
+        std::regex regex{ "^[a-zA-Z0-9]+$" };
+        if (!std::regex_match(ctx.m_player->get_raw_name(), regex)) {
+            ctx.m_player->send_log("`4Oops! `oYour name is including invalid characters, please try again.``");
             ctx.m_player->disconnect(0U);
             return;
         }

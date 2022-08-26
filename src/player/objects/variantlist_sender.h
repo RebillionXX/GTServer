@@ -75,6 +75,12 @@ namespace GTServer {
                 data
             }, delay);
         }
+        void OnFailedToEnterWorld(const bool& failed) {
+            this->send({
+                "OnFailedToEnterWorld",
+                failed ? 1 : 0
+            });
+        }
     private:
         ENetPeer* m_peer;
     };
