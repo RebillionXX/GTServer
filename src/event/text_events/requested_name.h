@@ -10,7 +10,9 @@
 
 namespace GTServer::events {
     void requested_name(EventContext& ctx) {
+        auto login_info{ ctx.m_player->get_login_info() };
         if (!ctx.m_parser.try_get<int32_t>("platformID", ctx.m_player->m_platform) ||
+            !ctx.m_parser.try_get("country", login_info->m_country) ||
             ctx.m_parser.get("meta", 1).empty() || 
             ctx.m_parser.get("rid", 1).empty() || 
             ctx.m_parser.get("mac", 1).empty() ||
@@ -27,10 +29,9 @@ namespace GTServer::events {
             ctx.m_player->disconnect(0U);
             return;
         }
-        auto login_info{ ctx.m_player->get_login_info() };
+
         login_info->m_mac = ctx.m_parser.get("mac", 1);
         login_info->m_rid = ctx.m_parser.get("rid", 1);
-
         switch (ctx.m_player->m_platform) {
             case PLATFORM_ID_WINDOWS: {
                 if (!(

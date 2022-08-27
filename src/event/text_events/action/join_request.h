@@ -1,4 +1,5 @@
 #pragma once
+#include <world/world.h>
 
 namespace GTServer::events {
     void join_request(EventContext& ctx) {
@@ -28,17 +29,32 @@ namespace GTServer::events {
             ctx.m_player->v_sender.OnFailedToEnterWorld(true);
             return;
         }
-        ctx.m_player->send_log("joining world: `w{}``", world_name);
-        /*std::vector<uint8_t> data{ world->serialize() };
+        const std::size_t& alloc = world->get_memory_usage();
+        uint8_t* data{ world->serialize() };
 
-        GameUpdatePacket update_packet{};
-        update_packet.type = NET_GAME_PACKET_SEND_MAP_DATA;
-        update_packet.net_id = -1;
-        update_packet.flags |= NET_GAME_PACKET_FLAGS_EXTENDED;
-        update_packet.data_size = static_cast<uint32_t>(data.size());
-        std::memcpy(&update_packet.data, data.data(), data.size());
-        ctx.m_player->send_packet(NET_MESSAGE_GAME_PACKET, &update_packet, sizeof(GameUpdatePacket) + data.size());
+        GameUpdatePacket* update_packet{ static_cast<GameUpdatePacket*>(std::malloc(sizeof(GameUpdatePacket) + alloc)) };
+        update_packet->type = NET_GAME_PACKET_SEND_MAP_DATA;
+        update_packet->net_id = -1;
+        update_packet->flags |= NET_GAME_PACKET_FLAGS_EXTENDED;
+        update_packet->data_size = static_cast<uint32_t>(alloc);
+        std::memcpy(&update_packet->data, data, alloc);
+        ctx.m_player->send_packet(NET_MESSAGE_GAME_PACKET, update_packet, sizeof(GameUpdatePacket) + alloc);
+        std::free(data);
 
-        uint32_t net_id = world->add_player(ctx.m_player);*/
+        ctx.m_player->set_world(world_name);
+        ctx.m_player->set_net_id(world->add_player(ctx.m_player));
+        ctx.m_player->set_position(32, 32);
+        ctx.m_player->v_sender.OnSpawn(ctx.m_player->get_spawn_data(true).get_all_raw());
+
+        ctx.m_player->send_log("joining world: `w{}`o, data_size: {}", world_name, alloc);
+        ctx.m_player->send_log("netID: {}, userID: {}, connectID: {}\n", 
+            ctx.m_player->get_net_id(), ctx.m_player->get_user_id(), ctx.m_player->get_connect_id());
+
+        world->foreach_player([&](const std::shared_ptr<Player>& player) {
+            if (player == ctx.m_player)
+                return;
+            ctx.m_player->v_sender.OnSpawn(player->get_spawn_data().get_all_raw());
+            player->v_sender.OnSpawn(ctx.m_player->get_spawn_data().get_all_raw());
+        });
     }
 }

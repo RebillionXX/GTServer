@@ -18,5 +18,7 @@ namespace GTServer {
         std::string m_gid{};
         std::string m_rid{};
         std::string m_mac{};
+
+        std::string m_country{ "us" };
     };
 }

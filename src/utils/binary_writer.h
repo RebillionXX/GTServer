@@ -7,20 +7,20 @@ namespace GTServer
     class BinaryWriter
 	{
 	public:
-		BinaryWriter(uint8_t* data, size_t pos = 0) : m_data(data) {
+		BinaryWriter(uint8_t* data, const std::size_t& pos = 0) : m_data(data) {
 			this->m_pos = pos;
 			this->m_delete_after = false;
 		}
-		BinaryWriter(size_t len) {
+		BinaryWriter(const std::size_t& size) {
 			this->m_pos = 0;
-			this->m_len = len;
+			this->m_size = size;
 
-			m_data = new uint8_t[len];
-			std::memset(m_data, 0, len);
+			m_data = (uint8_t*)std::malloc(size);
+			std::memset(m_data, 0, size);
 		}
 		~BinaryWriter() {
 			if (this->m_delete_after)
-				delete[] m_data;
+				std::free(m_data);
 		}
 
         template<typename T, typename std::enable_if_t<std::is_integral_v<T>, bool> = true>
@@ -56,23 +56,26 @@ namespace GTServer
 			std::memcpy(m_data + m_pos, val, len);
 			m_pos += len;
 		}
-		void skip(size_t len) {
+		void set_pos(const std::size_t& pos) {
+			this->m_pos = pos;
+		}
+		void skip_pos(size_t len) {
 			this->m_pos += len;
 		}
 
-		const uint8_t* get() {
+		[[nodiscard]] uint8_t* get() {
 			return m_data;
 		}
-		const size_t get_pos() {
+		[[nodiscard]] std::size_t get_pos() const {
 			return m_pos;
 		}
-		const size_t get_size() {
-			return m_len;
+		[[nodiscard]] std::size_t get_size() const {
+			return m_size;
 		}
 	private:
 		uint8_t* m_data;
-		size_t m_pos;
-		size_t m_len;
+		std::size_t m_pos;
+		std::size_t m_size;
 
 		bool m_delete_after{ true };
 	};

@@ -8,12 +8,12 @@ namespace GTServer {
         m_flags(0),
         m_name{ std::move(name) },
         m_width(width),
-        m_height(height) {
+        m_height(height),
+        m_net_id{ 0 } {
 
     }
     World::~World() {
-        for (auto& tile : m_tiles)
-            delete tile;
+        m_tiles.clear();
     }
 
     uint32_t World::add_player(const std::shared_ptr<Player>& player) {
@@ -37,8 +37,7 @@ namespace GTServer {
             func(pair.second);
     }
 
-    void World::generate()
-    {
+    void World::generate() {
         static randutils::pcg_rng gen{ utils::random::get_generator_local() };
         const auto& world_size = this->get_world_size();
 
@@ -46,36 +45,35 @@ namespace GTServer {
         for (int i = 0; i < world_size.first * world_size.second; ++i) {
             CL_Vec2i pos{ i % 100, i / 100 };
 
-            Tile* tile = new Tile{};
-            tile->set_position(pos);
+            Tile tile{};
+            tile.set_position(pos);
 
             if (pos.y > 24 && pos.y < 52) {
                 if (pos.y > 47 && gen.uniform(0.0f, 1.0f) < 0.4f) {
-                    tile->set_foreground(ITEM_LAVA);
+                    tile.set_foreground(ITEM_LAVA);
                 }
                 else {
                     if (gen.uniform(0.0f, 1.0f) < 0.04f) {
-                        tile->set_foreground(ITEM_ROCK);
+                        tile.set_foreground(ITEM_ROCK);
                     }
                     else {
-                        tile->set_foreground(ITEM_DIRT);
+                        tile.set_foreground(ITEM_DIRT);
                     }
                 }
             }
             else if (pos.y > 24) {
-                tile->set_foreground(ITEM_BEDROCK);
+                tile.set_foreground(ITEM_BEDROCK);
             }
 
             if (pos.y > 24) {
-                tile->set_background(ITEM_CAVE_BACKGROUND);
+                tile.set_background(ITEM_CAVE_BACKGROUND);
             }
 
-            m_tiles.push_back(tile);
+            m_tiles.push_back(std::move(tile));
         }
     }
 
-    std::size_t World::calculate_memory_usage()
-    {
+    std::size_t World::get_memory_usage() const {
         std::size_t size{ sizeof(uint16_t) }; // version
         size += sizeof(uint32_t); // flags
         size += sizeof(uint16_t); // name length
@@ -84,8 +82,8 @@ namespace GTServer {
         size += sizeof(uint32_t); // height
         size += sizeof(uint32_t); // tile count
 
-        for (Tile* tile : m_tiles)
-            size += tile->calculate_memory_usage();
+        for (auto& tile : m_tiles)
+            size += tile.get_memory_usage();
 
         size += sizeof(uint32_t); // object count
         size += sizeof(uint32_t); // object last id
@@ -93,12 +91,12 @@ namespace GTServer {
         size += sizeof(uint32_t); // base weather
         return size;
     }
+    uint8_t* World::serialize() const {
+        const auto& alloc = this->get_memory_usage();
+        uint8_t* data{ (uint8_t*)std::malloc(alloc) };
+        BinaryWriter buffer{ alloc };
 
-    std::vector<uint8_t> World::serialize()
-    {
-        std::vector<uint8_t> mem(calculate_memory_usage(), 0);
-
-        BinaryWriter buffer{ mem.data() };
+        std::memset(buffer.get(), 0, alloc);
         buffer.write<uint16_t>(0xF);
         buffer.write<uint32_t>(0);
         buffer.write(m_name);
@@ -106,15 +104,15 @@ namespace GTServer {
         buffer.write<uint32_t>(m_height);
         buffer.write<uint32_t>(static_cast<uint32_t>(m_tiles.size()));
 
-        for (Tile* tile : m_tiles) {
-            std::vector<uint8_t> data{ tile->serialize() };
-            buffer.write(data.data(), data.size());
-        }
+        for (auto& tile : m_tiles)
+            tile.serialize(buffer);
  
         buffer.write<uint32_t>(0);
         buffer.write<uint32_t>(0);
         buffer.write<uint32_t>(0);
         buffer.write<uint32_t>(0);
-        return mem;
+
+        std::memcpy(data, buffer.get(), alloc);
+        return data;
     }
 }

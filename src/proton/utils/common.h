@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 
 namespace GTServer {
     typedef struct _CL_Vec2f {
@@ -10,36 +11,20 @@ namespace GTServer {
             x = 0.0f;
             y = 0.0f;
         }
-
         _CL_Vec2f(float f) {
             x = f;
             y = f;
         }
-
         _CL_Vec2f(float x, float y) {
             this->x = x;
             this->y = y;
         }
 
-        bool operator==(const _CL_Vec2f& other) const {
-            return x == other.x && y == other.y;
-        }
-
-        bool operator!=(const _CL_Vec2f& other) const {
-            return x != other.x || y != other.y;
-        }
-
-        _CL_Vec2f operator+(const _CL_Vec2f& other) const {
-            return _CL_Vec2f(x + other.x, y + other.y);
-        }
-
-        _CL_Vec2f operator-(const _CL_Vec2f& other) const {
-            return _CL_Vec2f(x - other.x, y - other.y);
-        }
-
-        _CL_Vec2f operator*(const float& other) const {
-            return _CL_Vec2f(x * other, y * other);
-        }
+        bool operator==(const _CL_Vec2f& other) const { return x == other.x && y == other.y; }
+        bool operator!=(const _CL_Vec2f& other) const { return x != other.x || y != other.y; }
+        _CL_Vec2f operator+(const _CL_Vec2f& other) const { return _CL_Vec2f(x + other.x, y + other.y); }
+        _CL_Vec2f operator-(const _CL_Vec2f& other) const { return _CL_Vec2f(x - other.x, y - other.y); }
+        _CL_Vec2f operator*(const float& other) const { return _CL_Vec2f(x * other, y * other); }
     } CL_Vec2f;
 
     typedef struct _CL_Vec2i {
@@ -50,36 +35,20 @@ namespace GTServer {
             x = 0;
             y = 0;
         }
-
         _CL_Vec2i(int f) {
             x = f;
             y = f;
         }
-
         _CL_Vec2i(int x, int y) {
             this->x = x;
             this->y = y;
         }
 
-        bool operator==(const _CL_Vec2i& other) const {
-            return x == other.x && y == other.y;
-        }
-
-        bool operator!=(const _CL_Vec2i& other) const {
-            return x != other.x || y != other.y;
-        }
-
-        _CL_Vec2i operator+(const _CL_Vec2i& other) const {
-            return _CL_Vec2i(x + other.x, y + other.y);
-        }
-
-        _CL_Vec2i operator-(const _CL_Vec2i& other) const {
-            return _CL_Vec2i(x - other.x, y - other.y);
-        }
-
-        _CL_Vec2i operator*(const int& other) const {
-            return _CL_Vec2i(x * other, y * other);
-        }
+        bool operator==(const _CL_Vec2i& other) const { return x == other.x && y == other.y; }
+        bool operator!=(const _CL_Vec2i& other) const { return x != other.x || y != other.y; }
+        _CL_Vec2i operator+(const _CL_Vec2i& other) const { return _CL_Vec2i(x + other.x, y + other.y); }
+        _CL_Vec2i operator-(const _CL_Vec2i& other) const { return _CL_Vec2i(x - other.x, y - other.y); }
+        _CL_Vec2i operator*(const int& other) const { return _CL_Vec2i(x * other, y * other); }
     } CL_Vec2i;
 
     typedef struct _CL_Vec3f {

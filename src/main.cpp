@@ -20,7 +20,7 @@ std::shared_ptr<ServerPool> g_servers;
 std::shared_ptr<EventPool> g_events;
 
 int main() {
-    fmt::print("starting GTServer version {}\n", SERVER_VERSION);
+    fmt::print("starting {} V{}\n", SERVER_NAME, SERVER_VERSION);
 #ifdef HTTP_SERVER
     auto http_server{ std::make_unique<HTTPServer>(
         std::string{ config::http::address.begin(), config::http::address.end() }, 

@@ -1,24 +1,24 @@
-#ifndef PROTON_UTILS__TEXT_SCANNER_H
-#define PROTON_UTILS__TEXT_SCANNER_H
+#pragma once
 #include <algorithm>
 #include <ranges>
 #include <string>
 #include <vector>
 #include <fmt/format.h>
+#include <proton/utils/common.h>
 
 namespace GTServer
 {
-    class text_scanner { //thanks to ztz who helped me on this
+    class TextParse { //thanks to ztz who helped me on this
     public:
-        text_scanner() : m_data() {}
-        explicit text_scanner(const std::string& string) { 
+        TextParse() : m_data() {}
+        explicit TextParse(const std::string& string) { 
             this->parse(string); 
         }
-        explicit text_scanner(const std::vector<std::pair<std::string, std::string>>& data) {
+        explicit TextParse(const std::vector<std::pair<std::string, std::string>>& data) {
             for (const auto& it : data)
                 this->add(it.first, it.second);
         }
-        ~text_scanner() = default;
+        ~TextParse() = default;
 
         void parse(const std::string& string) {
             m_data = this->string_tokenize(string, "\n");
@@ -77,13 +77,34 @@ namespace GTServer
 			return true;
 		}
 
-        void add(const std::string &key, const std::string &value, const std::string &token = "|") {
+        TextParse* add(const std::string& key, const std::string& value, const std::string& token = "|") {
             m_data.push_back(key + token + value);
+            return this;
         }
         template<typename T, typename std::enable_if_t<std::is_integral_v<T> || std::is_floating_point_v<T>, bool> = true>
-        void add(const std::string &key, const T &value, const std::string &token = "|") {
+        TextParse* add(const std::string& key, const T& value, const std::string& token = "|") {
             this->add(key, std::to_string(value), token);
+            return this;
         }
+        TextParse* add(const std::string& key, const CL_Vec2i& value, const std::string& token = "|") {
+            std::string data{
+                std::to_string(value.x) + '|' +
+                std::to_string(value.y)
+            };
+            this->add(key, data, token);
+            return this;
+        }
+        TextParse* add(const std::string& key, const CL_Recti& value, const std::string& token = "|") {
+            std::string data{
+                std::to_string(value.x) + '|' +
+                std::to_string(value.y) + '|' +
+                std::to_string(value.width) + '|' +
+                std::to_string(value.height)
+            };
+            this->add(key, data, token);
+            return this;
+        }
+
         void set(const std::string &key, const std::string &value, const std::string &token = "|") {
             if (m_data.empty())
                 return;
@@ -137,5 +158,3 @@ namespace GTServer
         std::vector<std::string> m_data;
     };
 }
-
-#endif // PROTON_UTILS__TEXT_SCANNER_H

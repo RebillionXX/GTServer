@@ -18,6 +18,6 @@ namespace GTServer {
         std::shared_ptr<Database> m_database;
         std::shared_ptr<ItemDatabase> m_items;
         std::shared_ptr<EventPool> m_events;
-        text_scanner m_parser;
+        TextParse m_parser;
     };
 }

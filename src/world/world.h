@@ -20,8 +20,8 @@ namespace GTServer {
         [[nodiscard]] std::pair<uint32_t, uint32_t> get_world_size() const { return { m_width, m_height }; }
         void generate();
 
-        std::size_t calculate_memory_usage();
-        std::vector<uint8_t> serialize();
+        std::size_t get_memory_usage() const;
+        uint8_t* serialize() const;
 
     private:
         uint32_t m_flags;
@@ -30,7 +30,7 @@ namespace GTServer {
         uint32_t m_width;
         uint32_t m_height;
 
-        std::vector<Tile*> m_tiles;
+        std::vector<Tile> m_tiles;
 
         uint32_t m_net_id;
         std::unordered_map<uint32_t, std::shared_ptr<Player>> m_players;

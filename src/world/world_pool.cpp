@@ -24,7 +24,7 @@ namespace GTServer {
     }
 
     std::shared_ptr<World> WorldPool::new_world(const std::string& name) {
-        m_worlds[name] = std::make_shared<World>(name);
+        m_worlds[name] = std::make_shared<World>(name, 100, 60);
         m_worlds[name]->generate();
         return m_worlds[name];
     }

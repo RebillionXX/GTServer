@@ -2,6 +2,7 @@
 #include <string>
 #include <string_view>
 
+#define SERVER_NAME "GTServer"
 #define SERVER_VERSION "0.1.0"
 #define HTTP_SERVER
 
@@ -27,9 +28,8 @@ namespace GTServer {
             inline const bool& auto_reconnect{ true };
             inline const bool& debug{ false };
         }
-        namespace settings {
-            constexpr std::string_view server_name = "GTServer";
-            constexpr std::string_view discord_server = "https://discord.gg/wHVSrHKbYH";
+        namespace server {
+            constexpr std::string_view discord = "https://discord.gg/wHVSrHKbYH";
         }
     }
 }

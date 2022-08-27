@@ -34,7 +34,7 @@ namespace GTServer {
                 res.status = 403;
                 return;
             }
-            text_scanner parser{};
+            TextParse parser{};
             parser.add("server", std::string{ config::http::gt::address });
             parser.add<uint16_t>("port", 17091);
             parser.add<int>("type", 1);

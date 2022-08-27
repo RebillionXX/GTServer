@@ -119,7 +119,7 @@ namespace GTServer {
                     m_database, 
                     m_items,
                     m_events,
-                    text_scanner{ str } 
+                    TextParse{ str } 
                 };
 
                 std::string event_data = str.substr(0, str.find('|'));

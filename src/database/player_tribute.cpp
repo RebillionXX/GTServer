@@ -1,9 +1,11 @@
 #include <database/player_tribute.h>
 #include <fmt/core.h>
 #include <fmt/ranges.h>
+#include <config.h>
 #include <utils/packet.h>
 #include <utils/binary_writer.h>
 #include <proton/utils/misc_utils.h>
+
 namespace GTServer {
     PlayerTribute::PlayerTribute() : m_epic_players{} {
         this->insert_epic_player(PLAYER_ROLE_DEVELOPER, "Rebillion");
@@ -33,15 +35,16 @@ namespace GTServer {
             "`oDeveloper: {}\n"
             "`oManager: {}\n"
             "`oAdministrator: {}\n"
-            "`5Moderator: {}\n\n"
-            "`2Copyright GTServer (c)``", 
+            "`oModerator: {}\n\n"
+            "`2- {} V{}``", 
             fmt::join(get_epic_player(PLAYER_ROLE_DEVELOPER), "; "),
             fmt::join(get_epic_player(PLAYER_ROLE_MANAGER), "; "),
             fmt::join(get_epic_player(PLAYER_ROLE_ADMINISTRATOR), "; "),
-            fmt::join(get_epic_player(PLAYER_ROLE_MODERATOR), "; "))
+            fmt::join(get_epic_player(PLAYER_ROLE_MODERATOR), "; "),
+            SERVER_NAME, SERVER_VERSION)
         };
         std::string exceptional_mentors {
-            "`2T`3E`4E`5T`2T`3E`4E`5T"
+            "`eTest Message"
         };
 
         m_size = sizeof(uint32_t) + epic_players.length() + exceptional_mentors.length();
