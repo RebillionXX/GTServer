@@ -1,8 +1,8 @@
 #pragma once
 #include <vector>
 #include <filesystem>
-
 #include <database/item/item_info.h>
+#include <database/item/item_component.h>
 #include <proton/packet.h>
 
 namespace GTServer
@@ -10,15 +10,23 @@ namespace GTServer
     class ItemDatabase
     {
     public:
-        ItemDatabase();
+        ItemDatabase() = default;
         ~ItemDatabase();
         
         bool serialize();
         bool deserialize();
 
-        [[nodiscard]] uint32_t get_hash() const { return m_hash; }
-        [[nodiscard]] std::pair<std::size_t, TankUpdatePacket*> get_packet() const { return { m_size, m_packet }; }
-        [[nodiscard]] std::vector<ItemInfo*> get_items() { return this->m_items; }
+        static uint32_t get_hash() { return get().m_hash; }
+        static std::pair<std::size_t, TankUpdatePacket*> get_packet() { return { get().m_size, get().m_packet }; }
+        static std::vector<ItemInfo*> get_items() { return get().m_items; }
+
+        static ItemInfo* get_item(const uint32_t& item) { return get().get_item__interface(item); }
+    public:
+        static ItemDatabase& get() { static ItemDatabase ret; return ret; }
+
+    public:
+        ItemInfo* get_item__interface(const uint32_t& item);
+
     private:
         std::size_t m_size;
         uint8_t* m_data;

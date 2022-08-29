@@ -146,7 +146,7 @@ namespace GTServer {
                 var.pack(buffer);
             }
             uint8_t* ret = (uint8_t*)std::malloc(alloc);
-            memcpy(ret, buffer.get(), alloc);
+            std::memcpy(ret, buffer.get(), alloc);
             return ret;
         }
         [[nodiscard]] std::vector<variant> get_objects() const { return m_objects; }

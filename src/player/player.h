@@ -1,9 +1,12 @@
 #pragma once
+#include <array>
 #include <format>
 #include <enet/enet.h>
 #include <database/item/item_type.h>
 #include <player/objects/enums.h>
 #include <player/objects/roles.h>
+#include <player/objects/character_state.h>
+#include <player/objects/inventory.h>
 #include <player/objects/login_information.h>
 #include <player/objects/packet_sender.h>
 #include <player/objects/variantlist_sender.h>
@@ -13,7 +16,7 @@
 #include <proton/utils/text_scanner.h>
 
 namespace GTServer {
-    class Player : public PacketSender {
+    class Player : public PacketSender, public CharacterState {
     public:
         explicit Player(ENetPeer* peer);
         ~Player();
@@ -47,23 +50,26 @@ namespace GTServer {
         [[nodiscard]] uint32_t get_net_id() const { return m_net_id; }
         void set_position(const int& x, const int& y) { m_position = CL_Vec2i{ x, y }; }
         [[nodiscard]] CL_Vec2i get_position() const { return m_position; }
-        void set_cloth(const uint8_t& body_part, const int32_t& id) { m_cloth[body_part] = id; }
-        [[nodiscard]] int32_t get_cloth(const uint8_t& body_part) { return m_cloth[body_part]; }
 
-        TextParse get_spawn_data(const bool& local = false) const;
+        void set_cloth(const uint8_t& body_part, const uint16_t& id) { m_clothes[body_part] = id; }
+        [[nodiscard]] std::array<uint16_t, NUM_BODY_PARTS> get_clothes() const { return m_clothes; }
+        [[nodiscard]] Color get_skin_color() const { return m_skin_color; }
+
+        TextScanner get_spawn_data(const bool& local = false) const;
 
         template <typename... Args>
         void send_log(const std::string& format, Args&&... args) {
             const auto& data = fmt::format("action|log\nmsg|{}", std::vformat(format, std::make_format_args(args...)));
             this->send_packet(NET_MESSAGE_GAME_MESSAGE, data.data(), data.size());
         }
+        void send_character_state(std::shared_ptr<Player> player);
 
         [[nodiscord]] std::shared_ptr<LoginInformation> get_login_info() { return m_login_info; }
     public:
         enum eDialogType {
             DIALOG_TYPE_REGISTRATION
         };
-        void send_dialog(const eDialogType& type, TextParse parser);
+        void send_dialog(const eDialogType& type, TextScanner parser);
         
     public:
         int32_t m_platform{ PLATFORM_ID_UNKNOWN };
@@ -92,6 +98,7 @@ namespace GTServer {
         uint32_t m_net_id{ 0 };
         CL_Vec2i m_position{ 0, 0 };
 
-        int32_t m_cloth[NUM_BODY_PARTS];
+        std::array<uint16_t, NUM_BODY_PARTS> m_clothes{};
+        Color m_skin_color = Color{ 0xB4, 0x8A, 0x78, 0xFF };
     };
 }

@@ -10,14 +10,14 @@ namespace GTServer {
         EVENT_TYPE_GENERIC_TEXT,
         EVENT_TYPE_ACTION,
         EVENT_TYPE_GAME_PACKET,
-        TOTAL_EVENTS // used for EventQueue
+        NUM_EVENTS
     };
     struct EventContext {
         Server* m_server;
         std::shared_ptr<Player> m_player;
         std::shared_ptr<Database> m_database;
-        std::shared_ptr<ItemDatabase> m_items;
         std::shared_ptr<EventPool> m_events;
-        TextParse m_parser;
+
+        TextScanner m_parser;
     };
 }

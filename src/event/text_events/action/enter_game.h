@@ -4,10 +4,10 @@
 
 namespace GTServer::events {
     void enter_game(EventContext& ctx) {
-        if (!ctx.m_player->is_flag_on(PLAYER_FLAG_LOGGED_ON))
+        if (!ctx.m_player->is_flag_on(PLAYERFLAG_LOGGED_ON))
             return;
 
-        ctx.m_player->set_flag(PLAYER_FLAG_IS_IN);
+        ctx.m_player->set_flag(PLAYERFLAG_IS_IN);
         ctx.m_player->send_log("`oWelcome back ``{}`o, {} `wV{}``", 
             ctx.m_player->get_display_name(), 
             SERVER_NAME, SERVER_VERSION);

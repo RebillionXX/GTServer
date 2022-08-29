@@ -31,7 +31,6 @@ namespace GTServer {
             config->database);
 
             m_player_table = new PlayerTable(m_connection);
-            m_player_tribute = new PlayerTribute();
         }
         catch (const sqlpp::exception &e) {
             return false;

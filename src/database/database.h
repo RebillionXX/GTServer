@@ -40,16 +40,10 @@ namespace GTServer {
             const std::string& discord
         );
 
-        sqlpp::mysql::connection* get_connection() {
-            return m_connection;
-        }
-        PlayerTribute* get_tribute() {
-            return m_player_tribute;
-        }
+        sqlpp::mysql::connection* get_connection() { return m_connection; }
         void* get_table(const eDatabaseTable& table);
     private:
         sqlpp::mysql::connection* m_connection;
-        PlayerTribute* m_player_tribute{ nullptr };
         PlayerTable* m_player_table{ nullptr };
     };
 }

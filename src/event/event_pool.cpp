@@ -3,6 +3,8 @@
 #include <fmt/core.h>
 #include <utils/text.h>
 
+#include <event/tank_events/PACKET_STATE.h>
+
 #include <event/text_events/action.h>
 #include <event/text_events/requested_name.h>
 
@@ -32,6 +34,8 @@ namespace GTServer {
         reg_action("refresh_item_data", events::refresh_item_data);
         reg_action("refresh_player_tribute_data", events::refresh_player_tribute_data);
 
+        reg_packet(NET_GAME_PACKET_STATE, events::PACKET_STATE);
+        
         fmt::print(" - registered events, {} genetric texts {} actions {} game packets\n",
             this->get_registered_event(EVENT_TYPE_GENERIC_TEXT),
             this->get_registered_event(EVENT_TYPE_ACTION),
@@ -48,7 +52,7 @@ namespace GTServer {
          m_events[EVENT_TYPE_ACTION].push_back({ static_cast<uint32_t>(utils::quick_hash(ev)), fn });
     }
     void EventPool::reg_packet(const uint8_t& ev, std::function<void(EventContext&)> fn) {
-         m_events[EVENT_TYPE_GAME_PACKET].push_back({ static_cast<uint32_t>(ev), fn });
+         m_events[EVENT_TYPE_GAME_PACKET].push_back({ static_cast<uint32_t>(utils::quick_hash("gup_" + ev)), fn });
     }
 
     std::size_t EventPool::get_registered_event(const EventType& type) const {

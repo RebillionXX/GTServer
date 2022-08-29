@@ -11,7 +11,7 @@ namespace GTServer {
       public:
         using EventHandler = std::function<void(EventContext &)>;
       private:
-        std::array<EventHandler, static_cast<std::size_t>(EventType::TOTAL_EVENTS)> handlers{};
+        std::array<EventHandler, static_cast<std::size_t>(EventType::NUM_EVENTS)> handlers{};
         std::queue<EventContext> queue{};
     };
 }

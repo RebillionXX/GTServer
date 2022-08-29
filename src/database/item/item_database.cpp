@@ -7,7 +7,6 @@
 #include <proton/utils/misc_utils.h>
 
 namespace GTServer {
-    ItemDatabase::ItemDatabase() : m_size{}, m_hash{}, m_version{}, m_item_count{} {}
     ItemDatabase::~ItemDatabase() {
         for (auto item : m_items)
             delete item;
@@ -55,12 +54,18 @@ namespace GTServer {
 
         GameUpdatePacket* update_packet = reinterpret_cast<GameUpdatePacket*>(m_packet->data);
         std::memset(update_packet, 0, sizeof(GameUpdatePacket) + m_size);
-        update_packet->type = NET_GAME_PACKET_SEND_ITEM_DATABASE_DATA;
-        update_packet->net_id = -1;
-        update_packet->flags |= NET_GAME_PACKET_FLAGS_EXTENDED;
-        update_packet->data_size = (uint32_t)m_size;
-        std::memcpy(&update_packet->data, m_data, m_size);
+        update_packet->m_type = NET_GAME_PACKET_SEND_ITEM_DATABASE_DATA;
+        update_packet->m_net_id = -1;
+        update_packet->m_flags |= NET_GAME_PACKET_FLAGS_EXTENDED;
+        update_packet->m_data_size = (uint32_t)m_size;
+        std::memcpy(&update_packet->m_data, m_data, m_size);
         std::memcpy(&m_packet->data, update_packet, sizeof(GameUpdatePacket) + m_size);
         return true;
+    }
+
+    ItemInfo* ItemDatabase::get_item__interface(const uint32_t& item) {
+        if (item > m_items.size())
+            return m_items[ITEM_BLANK];
+        return m_items[item];
     }
 }

@@ -7,7 +7,7 @@ namespace GTServer {
     class TankUpdatePacket;
     class PlayerTribute {
     public:
-        PlayerTribute();
+        PlayerTribute() = default;
         ~PlayerTribute();
 
         void insert_epic_player(const ePlayerRole& role, const std::string& name);
@@ -19,6 +19,10 @@ namespace GTServer {
 
         [[nodiscard]] uint32_t get_hash() const { return m_hash; }
         [[nodiscard]] std::pair<std::size_t, TankUpdatePacket*> get_packet() const { return { m_size, m_packet }; }
+
+    public:
+        static PlayerTribute& get() { static PlayerTribute ret; return ret; }
+
     private:      
         std::size_t m_size;
         char* m_data;

@@ -11,9 +11,9 @@ namespace GTServer::events {
             return;
         const auto& dialog_hash = utils::quick_hash(ctx.m_parser.get("dialog_name"));
         switch (dialog_hash) {
-            case "growid"_qh: {
+            case "growid_apply"_qh: {
                 std::string 
-                    name{ ctx.m_parser.get("name", 1) },
+                    name{ ctx.m_parser.get("logon", 1) },
                     password{ ctx.m_parser.get("password", 1) },
                     verify_password{ ctx.m_parser.get("verify_password", 1) },
                     email{ ctx.m_parser.get("email", 1) },
@@ -22,8 +22,8 @@ namespace GTServer::events {
                 const std::pair<Database::RegistrationResult, std::string>& result = 
                     ctx.m_database->register_player(name, password, verify_password, email, discord);
                 if (result.first != Database::RegistrationResult::SUCCESS) {
-                    ctx.m_player->send_dialog(Player::DIALOG_TYPE_REGISTRATION, TextParse({ 
-                        { "name", name }, 
+                    ctx.m_player->send_dialog(Player::DIALOG_TYPE_REGISTRATION, TextScanner({ 
+                        { "logon", name }, 
                         { "password", password },
                         { "verify_password", verify_password },
                         { "email", email },
@@ -32,7 +32,7 @@ namespace GTServer::events {
                     }));
                     break;
                 }
-                ctx.m_player->send_log("TODO: register");
+                ctx.m_player->send_log("That feature isn't added yet");
                 break;
             }
             default: {

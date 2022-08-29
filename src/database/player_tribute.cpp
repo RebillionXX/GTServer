@@ -7,9 +7,6 @@
 #include <proton/utils/misc_utils.h>
 
 namespace GTServer {
-    PlayerTribute::PlayerTribute() : m_epic_players{} {
-        this->insert_epic_player(PLAYER_ROLE_DEVELOPER, "Rebillion");
-    }
     PlayerTribute::~PlayerTribute() {
         this->destroy();
     }
@@ -31,6 +28,8 @@ namespace GTServer {
     }
         
     bool PlayerTribute::build() {
+        this->insert_epic_player(PLAYER_ROLE_DEVELOPER, "Rebillion");
+
         std::string epic_players{ fmt::format(
             "`oDeveloper: {}\n"
             "`oManager: {}\n"
@@ -63,11 +62,11 @@ namespace GTServer {
         m_packet->data = static_cast<char*>(std::malloc(sizeof(GameUpdatePacket) + m_size));
 
         GameUpdatePacket* update_packet = reinterpret_cast<GameUpdatePacket*>(m_packet->data);
-        update_packet->type = NET_GAME_PACKET_SEND_PLAYER_TRIBUTE_DATA;
-        update_packet->net_id = -1;
-        update_packet->flags |= NET_GAME_PACKET_FLAGS_EXTENDED;
-        update_packet->data_size = (uint32_t)m_size;
-        std::memcpy(&update_packet->data, m_data, m_size);
+        update_packet->m_type = NET_GAME_PACKET_SEND_PLAYER_TRIBUTE_DATA;
+        update_packet->m_net_id = -1;
+        update_packet->m_flags |= NET_GAME_PACKET_FLAGS_EXTENDED;
+        update_packet->m_data_size = (uint32_t)m_size;
+        std::memcpy(&update_packet->m_data, m_data, m_size);
         std::memcpy(&m_packet->data, update_packet, sizeof(GameUpdatePacket) + m_size);
         return true;
     }

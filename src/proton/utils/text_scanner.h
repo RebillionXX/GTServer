@@ -8,17 +8,17 @@
 
 namespace GTServer
 {
-    class TextParse { //thanks to ztz who helped me on this
+    class TextScanner { //thanks to ztz who helped me on this
     public:
-        TextParse() : m_data() {}
-        explicit TextParse(const std::string& string) { 
+        TextScanner() : m_data() {}
+        explicit TextScanner(const std::string& string) { 
             this->parse(string); 
         }
-        explicit TextParse(const std::vector<std::pair<std::string, std::string>>& data) {
+        explicit TextScanner(const std::vector<std::pair<std::string, std::string>>& data) {
             for (const auto& it : data)
                 this->add(it.first, it.second);
         }
-        ~TextParse() = default;
+        ~TextScanner() = default;
 
         void parse(const std::string& string) {
             m_data = this->string_tokenize(string, "\n");
@@ -77,16 +77,16 @@ namespace GTServer
 			return true;
 		}
 
-        TextParse* add(const std::string& key, const std::string& value, const std::string& token = "|") {
+        TextScanner* add(const std::string& key, const std::string& value, const std::string& token = "|") {
             m_data.push_back(key + token + value);
             return this;
         }
         template<typename T, typename std::enable_if_t<std::is_integral_v<T> || std::is_floating_point_v<T>, bool> = true>
-        TextParse* add(const std::string& key, const T& value, const std::string& token = "|") {
+        TextScanner* add(const std::string& key, const T& value, const std::string& token = "|") {
             this->add(key, std::to_string(value), token);
             return this;
         }
-        TextParse* add(const std::string& key, const CL_Vec2i& value, const std::string& token = "|") {
+        TextScanner* add(const std::string& key, const CL_Vec2i& value, const std::string& token = "|") {
             std::string data{
                 std::to_string(value.x) + '|' +
                 std::to_string(value.y)
@@ -94,7 +94,7 @@ namespace GTServer
             this->add(key, data, token);
             return this;
         }
-        TextParse* add(const std::string& key, const CL_Recti& value, const std::string& token = "|") {
+        TextScanner* add(const std::string& key, const CL_Recti& value, const std::string& token = "|") {
             std::string data{
                 std::to_string(value.x) + '|' +
                 std::to_string(value.y) + '|' +
@@ -128,16 +128,14 @@ namespace GTServer
 			return this->get(key) != "" ? true : false;
 		}
 
-        std::vector<std::string> get_all_array()
-        {
+        std::vector<std::string> get_all_array() {
             std::vector<std::string> ret{};
             for(int i = 0; i < m_data.size(); i++)
                 ret.push_back(fmt::format("[{}]: {}", i, m_data[i]));
 
             return ret;
         }
-        std::string get_all_raw()
-        {
+        std::string get_all_raw() const {
             std::string string{};
             for (int i = 0; i < m_data.size(); i++) {
                 string += m_data.at(i);

@@ -15,13 +15,13 @@ namespace GTServer {
         PLATFORM_ID_HTML5
     };
     enum ePlayerFlags {
-        PLAYER_FLAG_LOGGED_ON = (1 << 0),
-        PLAYER_FLAG_IS_IN = (1 << 1),
-        PLAYER_FLAG_UPDATING_ITEMS = (1 << 2),
-        PLAYER_FLAG_UPDATING_TRIBUTE = (1 << 3),
-        PLAYER_FLAG_IS_FACING_LEFT = (1 << 4),
-        PLAYER_FLAG_IS_INVISIBLE = (1 << 5),
-        PLAYER_FLAG_IS_MOD = (1 << 6),
-        PLAYER_FLAG_IS_SUPER_MOD = (1 << 7)
+        PLAYERFLAG_LOGGED_ON = (1 << 0),
+        PLAYERFLAG_IS_IN = (1 << 1),
+        PLAYERFLAG_UPDATING_ITEMS = (1 << 2),
+        PLAYERFLAG_UPDATING_TRIBUTE = (1 << 3),
+        PLAYERFLAG_IS_FACING_LEFT = (1 << 4),
+        PLAYERFLAG_IS_INVISIBLE = (1 << 5),
+        PLAYERFLAG_IS_MOD = (1 << 6),
+        PLAYERFLAG_IS_SUPER_MOD = (1 << 7)
     };
 }

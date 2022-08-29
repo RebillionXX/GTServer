@@ -14,11 +14,15 @@ namespace GTServer {
         uint32_t add_player(const std::shared_ptr<Player>& player);
         void remove_player(const std::shared_ptr<Player>& player);
         bool has_player(const std::shared_ptr<Player>& player);
+        std::vector<std::shared_ptr<Player>> get_players();
         void foreach_player(const std::function<void(const std::shared_ptr<Player>&)>& func);
 
         void set_world_size(const uint32_t& width, const uint32_t& height) { m_width = width; m_height = height; }
         [[nodiscard]] std::pair<uint32_t, uint32_t> get_world_size() const { return { m_width, m_height }; }
         void generate();
+
+        CL_Vec2i get_tile_pos(const uint16_t& id) const;
+        CL_Vec2i get_tile_pos(const eItemTypes& type) const;
 
         std::size_t get_memory_usage() const;
         uint8_t* serialize() const;

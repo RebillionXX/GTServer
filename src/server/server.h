@@ -15,7 +15,7 @@ namespace GTServer {
     public:
         Server(const uint8_t& instanceId, const std::string& address, const uint16_t& port, const size_t& max_peers);
         ~Server();
-        void set_component(std::shared_ptr<EventPool> events, std::shared_ptr<Database> database, std::shared_ptr<ItemDatabase> items);
+        void set_component(std::shared_ptr<EventPool> events, std::shared_ptr<Database> database);
         
         std::pair<std::string, uint16_t> get_host();
         bool start();
@@ -51,6 +51,5 @@ namespace GTServer {
     private:
         std::shared_ptr<EventPool> m_events;
         std::shared_ptr<Database> m_database;
-        std::shared_ptr<ItemDatabase> m_items;
     };
 }

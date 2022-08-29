@@ -2,6 +2,9 @@
 #include <enet/enet.h>
 #include <proton/packet.h>
 #include <proton/variant.h>
+#include <proton/utils/text_scanner.h>
+#include <utils/color.h>
+#include <player/objects/enums.h>
 #include <player/objects/packet_sender.h>
 
 namespace GTServer {
@@ -37,23 +40,39 @@ namespace GTServer {
                 data
             }, delay);
         }
+        void OnConsoleMessage(const std::string& message, uint32_t delay = 0) {
+            this->send_varlist({ 
+                "OnConsoleMessage",
+                message
+            }, delay);
+        }
         void OnRequestWorldSelectMenu(const std::string& data, int32_t delay = 0) {
             this->send_varlist({
                 "OnRequestWorldSelectMenu",
                 data
             }, delay);
         }
-        void OnFailedToEnterWorld(const bool& failed) {
+        void OnFailedToEnterWorld(const bool& val) {
             this->send_varlist({
                 "OnFailedToEnterWorld",
-                failed ? 1 : 0
+                val ? 1 : 0
             });
         }
-        void OnSpawn(const std::string& data) {
+        void OnSpawn(const TextScanner& data) {
             this->send_varlist({
                 "OnSpawn",
-                data
-            });
+                data.get_all_raw()
+            }, -1);
+        }
+        void OnSetClothing(std::array<uint16_t, NUM_BODY_PARTS> cloth, const Color& color, const bool& sound, const uint32_t& net_id, const int32_t& delay = 0) {
+            this->send_varlist({
+                "OnSetClothing",
+                CL_Vec3f{ cloth[CLOTHTYPE_HAIR], cloth[CLOTHTYPE_SHIRT], cloth[CLOTHTYPE_PANTS] },
+                CL_Vec3f{ cloth[CLOTHTYPE_FEET], cloth[CLOTHTYPE_FACE], cloth[CLOTHTYPE_HAND] },
+                CL_Vec3f{ cloth[CLOTHTYPE_BACK], cloth[CLOTHTYPE_MASK], cloth[CLOTHTYPE_NECKLACE] },
+                (int)color.get_uint(),
+                CL_Vec3f{ cloth[CLOTHTYPE_ANCES], sound, 0 }
+            }, delay, net_id);
         }
     private:
         ENetPeer* m_peer;

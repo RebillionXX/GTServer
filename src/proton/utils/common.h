@@ -43,6 +43,10 @@ namespace GTServer {
             this->x = x;
             this->y = y;
         }
+        _CL_Vec2i(uint32_t x, uint32_t y) {
+            this->x = x;
+            this->y = y;
+        }
 
         bool operator==(const _CL_Vec2i& other) const { return x == other.x && y == other.y; }
         bool operator!=(const _CL_Vec2i& other) const { return x != other.x || y != other.y; }
@@ -72,6 +76,11 @@ namespace GTServer {
             this->x = x;
             this->y = y;
             this->z = z;
+        }
+        _CL_Vec3f(uint16_t x, uint16_t y, uint16_t z) {
+            this->x = static_cast<float>(x);
+            this->y = static_cast<float>(y);
+            this->z = static_cast<float>(z);
         }
 
         bool operator==(const _CL_Vec3f& other) const {

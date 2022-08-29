@@ -17,7 +17,7 @@ namespace GTServer::events {
             ctx.m_parser.get("rid", 1).empty() || 
             ctx.m_parser.get("mac", 1).empty() ||
             ctx.m_parser.get("requestedName", 1).empty() ||
-            ctx.m_player->is_flag_on(PLAYER_FLAG_LOGGED_ON)) {
+            ctx.m_player->is_flag_on(PLAYERFLAG_LOGGED_ON)) {
             ctx.m_player->disconnect(0U);
             return;
         }
@@ -71,15 +71,15 @@ namespace GTServer::events {
             ctx.m_player->set_user_id(uid);
         }
 
-        ctx.m_player->set_flag(PLAYER_FLAG_LOGGED_ON);
+        ctx.m_player->set_flag(PLAYERFLAG_LOGGED_ON);
         fmt::print("{} has logged on.\n", ctx.m_player->get_raw_name());
         ctx.m_player->v_sender.OnSuperMainStart(
-            ctx.m_items->get_hash(),
+            ItemDatabase::get().get_hash(),
             "ubistatic-a.akamaihd.net", 
             "0098/75414/cache/", 
             "cc.cz.madkite.freedom org.aqua.gg idv.aqua.bulldog com.cih.gamecih2 com.cih.gamecih com.cih.game_cih cn.maocai.gamekiller com.gmd.speedtime org.dax.attack com.x0.strai.frep com.x0.strai.free org.cheatengine.cegui org.sbtools.gamehack com.skgames.traffikrider org.sbtoods.gamehaca com.skype.ralder org.cheatengine.cegui.xx.multi1458919170111 com.prohiro.macro me.autotouch.autotouch com.cygery.repetitouch.free com.cygery.repetitouch.pro com.proziro.zacro com.slash.gamebuster",
             "proto=172|choosemusic=audio/mp3/about_theme.mp3|active_holiday=0|wing_week_day=0|ubi_week_day=0|server_tick=263203319|clash_active=0|drop_lavacheck_faster=1|isPayingUser=0|usingStoreNavigation=1|enableInventoryTab=1|bigBackpack=1|",
-            ctx.m_database->get_tribute()->get_hash()
+            PlayerTribute::get().get_hash()
         );
     }
 }

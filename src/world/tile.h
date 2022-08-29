@@ -3,6 +3,7 @@
 #include <vector>
 #include <utils/binary_writer.h>
 #include <proton/utils/common.h>
+#include <world/objects/enums.h>
 #include <world/tile_extra.h>
 
 namespace GTServer {
@@ -20,6 +21,10 @@ namespace GTServer {
         void set_parent(const uint16_t& parent) { m_parent = parent; }
         [[nodiscard]] uint16_t get_parent() const { return m_parent; }
         
+        bool is_flag_on(const eTileFlags& bits) const;
+        void set_flag(const eTileFlags& bits);
+        void remove_flag(const eTileFlags& bits);
+
         std::size_t get_memory_usage() const;
         void serialize(BinaryWriter& buffer) const;
 
