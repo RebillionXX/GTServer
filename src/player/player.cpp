@@ -9,6 +9,7 @@ namespace GTServer {
     Player::Player(ENetPeer* peer) : 
         m_peer(peer),
         m_login_info{ std::make_shared<LoginInformation>() },
+        m_inventory{ std::make_shared<Inventory>(peer) },
         v_sender{ peer },
         PacketSender{ peer },
         CharacterState{}

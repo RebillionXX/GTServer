@@ -2,19 +2,15 @@
 #include <unordered_map>
 #include <string>
 #include <server/server.h>
-#include <server/load_balancer.h>
-#include <server/server_gateway.h>
 #include <fmt/chrono.h>
 
 namespace GTServer {
+    class EventPool;
+    class Database;
     class ServerPool {
     public:
-        explicit ServerPool(std::shared_ptr<EventPool> events, std::shared_ptr<Database> database) :
-            m_events{ events },
-            m_database{ database } {
-            fmt::print("Initializing ServerPool\n");
-        }
-        ~ServerPool() = default;
+        explicit ServerPool(std::shared_ptr<EventPool> events, std::shared_ptr<Database> database);
+        ~ServerPool();
 
         bool initialize_enet() {
             if (enet_initialize() != 0) {

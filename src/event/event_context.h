@@ -2,6 +2,7 @@
 #include <functional>
 #include <player/player.h>
 #include <server/server.h>
+#include <proton/packet.h>
 #include <database/item/item_database.h>
 
 namespace GTServer {
@@ -19,5 +20,6 @@ namespace GTServer {
         std::shared_ptr<EventPool> m_events;
 
         TextScanner m_parser;
+        GameUpdatePacket* m_update_packet;
     };
 }

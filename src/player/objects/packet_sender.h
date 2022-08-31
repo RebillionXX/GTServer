@@ -23,11 +23,11 @@ namespace GTServer {
         void send_packet(TankUpdatePacket* tank_packet, uintmax_t data_size) {
             if (!this->get_peer())
                 return;
-            GameUpdatePacket* update_packet = reinterpret_cast<GameUpdatePacket*>(&tank_packet->data); 
+            GameUpdatePacket* update_packet = reinterpret_cast<GameUpdatePacket*>(&tank_packet->m_data); 
             ENetPacket* packet = enet_packet_create(nullptr, data_size, ENET_PACKET_FLAG_RELIABLE);
             if (!packet || !update_packet)
                 return;
-            std::memcpy(packet->data, &tank_packet->type, 4);
+            std::memcpy(packet->data, &tank_packet->m_type, 4);
             std::memcpy(packet->data + 4, update_packet, sizeof(GameUpdatePacket) + update_packet->m_data_size);
 
             if (enet_peer_send(m_peer, 0, packet) != 0)

@@ -36,29 +36,19 @@ namespace GTServer::events {
             player->v_sender.OnFailedToEnterWorld(true);
             return;
         }
-        const std::size_t& alloc = world->get_memory_usage();
-        uint8_t* data{ world->serialize() };
-
-        GameUpdatePacket* update_packet{ static_cast<GameUpdatePacket*>(std::malloc(sizeof(GameUpdatePacket) + alloc)) };
-        update_packet->m_type = NET_GAME_PACKET_SEND_MAP_DATA;
-        update_packet->m_net_id = -1;
-        update_packet->m_flags |= NET_GAME_PACKET_FLAGS_EXTENDED;
-        update_packet->m_data_size = static_cast<uint32_t>(alloc);
-        std::memcpy(&update_packet->m_data, data, alloc);
-        player->send_packet(NET_MESSAGE_GAME_PACKET, update_packet, sizeof(GameUpdatePacket) + alloc);
-        std::free(data);
-        std::free(update_packet); 
+        world->send_data(player);
 
         const auto& spawn_pos{ world->get_tile_pos(ITEMTYPE_MAIN_DOOR) * 32 };
-        const uint32_t& net_id = world->add_player(player);
         player->set_world(world_name);
-        player->set_net_id(net_id);
+        player->set_net_id(world->add_player(player));
         player->set_position(spawn_pos.x, spawn_pos.y);
+        player->m_inventory->send();
+
         player->v_sender.OnSpawn(player->get_spawn_data(true));
-        player->v_sender.OnSetClothing(player->get_clothes(), player->get_skin_color(), false, net_id);
+        player->v_sender.OnSetClothing(player->get_clothes(), player->get_skin_color(), false, player->get_net_id());
         player->send_character_state(player);
 
-        world->foreach_player([&](const std::shared_ptr<Player>& ply) {
+        world->broadcast([&](const std::shared_ptr<Player>& ply) {
             if (ply == player)
                 return;
             player->v_sender.OnSpawn(ply->get_spawn_data());

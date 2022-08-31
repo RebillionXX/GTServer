@@ -49,23 +49,23 @@ namespace GTServer {
 
         m_packet = static_cast<TankUpdatePacket*>(std::malloc(sizeof(TankUpdatePacket) + sizeof(GameUpdatePacket) + m_size));
         std::memset(m_packet, 0, sizeof(TankUpdatePacket) + sizeof(GameUpdatePacket) + m_size);
-        m_packet->type = NET_MESSAGE_GAME_PACKET;
-        m_packet->data = static_cast<char*>(std::malloc(sizeof(GameUpdatePacket) + m_size));
+        m_packet->m_type = NET_MESSAGE_GAME_PACKET;
+        m_packet->m_data = static_cast<char*>(std::malloc(sizeof(GameUpdatePacket) + m_size));
 
-        GameUpdatePacket* update_packet = reinterpret_cast<GameUpdatePacket*>(m_packet->data);
+        GameUpdatePacket* update_packet = reinterpret_cast<GameUpdatePacket*>(m_packet->m_data);
         std::memset(update_packet, 0, sizeof(GameUpdatePacket) + m_size);
         update_packet->m_type = NET_GAME_PACKET_SEND_ITEM_DATABASE_DATA;
         update_packet->m_net_id = -1;
         update_packet->m_flags |= NET_GAME_PACKET_FLAGS_EXTENDED;
         update_packet->m_data_size = (uint32_t)m_size;
         std::memcpy(&update_packet->m_data, m_data, m_size);
-        std::memcpy(&m_packet->data, update_packet, sizeof(GameUpdatePacket) + m_size);
+        std::memcpy(&m_packet->m_data, update_packet, sizeof(GameUpdatePacket) + m_size);
         return true;
     }
 
     ItemInfo* ItemDatabase::get_item__interface(const uint32_t& item) {
         if (item > m_items.size())
-            return m_items[ITEM_BLANK];
+            return nullptr;
         return m_items[item];
     }
 }

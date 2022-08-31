@@ -23,13 +23,12 @@ namespace GTServer {
 
         std::size_t get_registered_event(const EventType& type) const;
         
-        template <typename T>
-        bool execute(const EventType& type, const T& data, EventContext& ctx) {
+        bool execute(const EventType& type, const std::string& data, EventContext& ctx) {
             const auto& it = m_events.find(type);
             if (it == m_events.end())
                 return false;
 
-            const uint32_t& ev_hash{ utils::quick_hash(std::string{ data }) };
+            const uint32_t& ev_hash{ utils::quick_hash(data) };
             for (const auto& ev : it->second) {
                 if (ev_hash != ev.first)
                     continue;

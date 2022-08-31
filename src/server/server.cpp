@@ -69,7 +69,7 @@ namespace GTServer {
                 case ENET_EVENT_TYPE_RECEIVE: {
                     if (!m_event.peer || !m_event.peer->data)
                         break;
-                    if (m_event.packet->dataLength < sizeof(TankUpdatePacket::type) + 1 || m_event.packet->dataLength > 0x200)
+                    if (m_event.packet->dataLength < sizeof(TankUpdatePacket::m_type) + 1 || m_event.packet->dataLength > 0x200)
                         break;
                     this->on_receive(m_event.peer, m_event.packet);
                     enet_packet_destroy(m_event.packet);
@@ -100,25 +100,20 @@ namespace GTServer {
         m_player_pool->remove_player(connect_id);
     }
     void Server::on_receive(ENetPeer* peer, ENetPacket* packet) {
+        if (packet->dataLength < 0x5 || packet->dataLength > 0x200)
+            return;
         std::shared_ptr<Player> player{ m_player_pool->get_player(peer->connectID) };
         if (!player) {
             player->send_log("Server requested you to re-logon.");
             player->disconnect(0U);
             return;
         }
-        const auto& tank_packet = reinterpret_cast<TankUpdatePacket*>(m_event.packet->data);
 
-        switch (tank_packet->type) {
+        switch (static_cast<uint32_t>(*packet->data)) {
             case NET_MESSAGE_GENERIC_TEXT:
             case NET_MESSAGE_GAME_MESSAGE: {
-                const auto& str = utils::get_tank_update_data(m_event.packet);
-                EventContext ctx{ 
-                    this,
-                    player,
-                    m_database, 
-                    m_events,
-                    TextScanner{ str } 
-                };
+                const auto& str = utils::get_generic_text(m_event.packet);
+                EventContext ctx{ this, player, m_database,  m_events, TextScanner{ str }, nullptr };
 
                 std::string event_data = str.substr(0, str.find('|'));
                 if (!m_events->execute(EVENT_TYPE_GENERIC_TEXT, event_data, ctx))
@@ -126,9 +121,15 @@ namespace GTServer {
                 break;
             }
             case NET_MESSAGE_GAME_PACKET: {
-                GameUpdatePacket* update_packet = reinterpret_cast<GameUpdatePacket*>(tank_packet->data);
-                if (!update_packet)
+                if (packet->dataLength < sizeof(GameUpdatePacket) - 5)
+                    return;
+                GameUpdatePacket* update_packet{ reinterpret_cast<GameUpdatePacket*>(packet->data + 4) };
+                EventContext ctx{ this, player, m_database,  m_events, TextScanner{}, update_packet };
+
+                if (!m_events->execute(EVENT_TYPE_GAME_PACKET, "gup_" + std::to_string(update_packet->m_type), ctx)) {
+                    player->send_log("unhandled EVENT_TYPE_GAME_PACKET -> `w{}`o, ptr: `w{}``", update_packet->m_type, fmt::ptr(update_packet));
                     break;
+                }
                 break;
             }
         }

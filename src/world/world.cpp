@@ -39,27 +39,27 @@ namespace GTServer {
             ret.push_back(pair.second);
         return ret;
     }
-    void World::foreach_player(const std::function<void(const std::shared_ptr<Player>&)>& func) {
+    void World::broadcast(const std::function<void(const std::shared_ptr<Player>&)>& func) {
         for (const auto& pair : m_players)
             func(pair.second);
     }
 
     void World::generate() {
         static randutils::pcg_rng gen{ utils::random::get_generator_local() };
-        const auto& world_size = this->get_world_size();
+        const auto& world_size = this->get_size();
         const CL_Vec2i& dirt_layer {
             24, // START
             52  // END
         };
         const CL_Vec2i& maindoor_pos {
-            gen.uniform(0, static_cast<int>(world_size.first - 5)) + 5,
+            gen.uniform(0, static_cast<int>(world_size.x - 5)) + 5,
             dirt_layer.x
         };
         const int& lava_layer{ 47 };
         const int& bedrock_layer{ 51 };
 
-        m_tiles.reserve(world_size.first * world_size.second);
-        for (int i = 0; i < world_size.first * world_size.second; ++i) {
+        m_tiles.reserve(world_size.x * world_size.y);
+        for (int i = 0; i < world_size.x * world_size.y; ++i) {
             CL_Vec2i pos{ i % 100, i / 100 };
 
             Tile tile{};
@@ -158,5 +158,20 @@ namespace GTServer {
 
         std::memcpy(data, buffer.get(), alloc);
         return data;
+    }
+    void World::send_data(std::shared_ptr<Player> player) {
+        const std::size_t& alloc = this->get_memory_usage();
+        uint8_t* data{ this->serialize() };
+
+        GameUpdatePacket* update_packet{ static_cast<GameUpdatePacket*>(std::malloc(sizeof(GameUpdatePacket) + alloc)) };
+        update_packet->m_type = NET_GAME_PACKET_SEND_MAP_DATA;
+        update_packet->m_net_id = -1;
+        update_packet->m_flags |= NET_GAME_PACKET_FLAGS_EXTENDED;
+        update_packet->m_data_size = static_cast<uint32_t>(alloc);
+        std::memcpy(&update_packet->m_data, data, alloc);
+        player->send_packet(NET_MESSAGE_GAME_PACKET, update_packet, sizeof(GameUpdatePacket) + alloc);
+        
+        std::free(data);
+        std::free(update_packet);
     }
 }

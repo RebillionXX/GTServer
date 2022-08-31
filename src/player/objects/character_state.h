@@ -80,7 +80,7 @@ namespace GTServer {
         float m_punch_strength = 350.0f;
         std::array<bool, NUM_STATE_FLAGS> m_flags;
 
-        Color m_pupil_color{ 0xFF, 0xFF, 0xFF, 0xFF };
+        Color m_pupil_color{ 0, 0, 0, 0xFF };
         Color m_hair_color{ 0xFF, 0xFF, 0xFF, 0xFF };
         Color m_eyes_color{ 0xFF, 0xFF, 0xFF, 0xFF };
     };

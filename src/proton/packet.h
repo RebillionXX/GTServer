@@ -68,8 +68,8 @@ namespace GTServer {
 
     #pragma pack(push, 1)
     struct TankUpdatePacket {
-        int32_t type;
-        char* data;
+        int32_t m_type;
+        char* m_data;
     };
     #pragma pack(pop)
     
