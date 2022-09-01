@@ -12,7 +12,7 @@ namespace utils {
         const std::regex pattern("(\\w+)#(\\d)+");
         return std::regex_match(val, pattern); //took example from is_valid_email(string)
     }
-    constexpr bool to_lowercase(std::string& str) {
+    inline constexpr bool to_lowercase(std::string& str) {
         if (str.empty()) 
             return false;
 
@@ -24,7 +24,7 @@ namespace utils {
         }
         return true;
     }
-    constexpr uint32_t quick_hash(const std::string_view& data) {
+    inline constexpr uint32_t quick_hash(const std::string_view& data) {
         uint32_t hash = 5381;
         for (const auto& c : data)
             hash = ((hash << 5) + hash) + c;

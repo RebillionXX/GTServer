@@ -3,7 +3,8 @@
 #include <string>
 #include <proton/packet.h>
 
-namespace GTServer::utils {
+using namespace GTServer;
+namespace utils {
     inline std::string get_generic_text(ENetPacket* packet) {
         packet->data[packet->dataLength - 1] = 0;
         return reinterpret_cast<char*>(packet->data + sizeof(TankUpdatePacket::m_type));

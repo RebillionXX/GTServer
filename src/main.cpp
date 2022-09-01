@@ -51,8 +51,10 @@ int main() {
         fmt::print("failed to initialize enet, shutting down the server.\n");
         return EXIT_FAILURE;
     }
-    
-    std::shared_ptr<Server> server{ g_servers->start_instance() };
-    server->start_service();
-    while(true);
+    g_servers->start_service();
+   
+    while (g_servers->is_running()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
+    return EXIT_SUCCESS;
 }
