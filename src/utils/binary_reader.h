@@ -9,9 +9,9 @@ namespace GTServer
 	public:
 		BinaryReader(uint8_t* data)
 			: m_data(data), m_pos(0) {}
-		BinaryReader(std::vector<uint8_t> data) : m_pos(0) {
+		BinaryReader(const std::vector<uint8_t>& data) : m_pos(0) {
 			auto alloc = data.size();
-			m_data = new uint8_t[alloc];
+			m_data = (uint8_t*)std::malloc(alloc);
 			std::memcpy(m_data, data.data(), alloc);
 		}
 		~BinaryReader() {

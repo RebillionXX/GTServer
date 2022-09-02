@@ -74,8 +74,8 @@ namespace GTServer {
     public:
         int32_t m_platform{ PLATFORM_ID_UNKNOWN };
         std::shared_ptr<LoginInformation> m_login_info;
-        std::shared_ptr<Inventory> m_inventory;
         
+        Inventory m_inventory;
         VariantListSender v_sender;
     private:
         ENetPeer* m_peer;

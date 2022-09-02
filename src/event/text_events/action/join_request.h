@@ -42,7 +42,7 @@ namespace GTServer::events {
         player->set_world(world_name);
         player->set_net_id(world->add_player(player));
         player->set_position(spawn_pos.x, spawn_pos.y);
-        player->m_inventory->send();
+        player->m_inventory.send();
 
         player->v_sender.OnSpawn(player->get_spawn_data(true));
         player->v_sender.OnSetClothing(player->get_clothes(), player->get_skin_color(), false, player->get_net_id());

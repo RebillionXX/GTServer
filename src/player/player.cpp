@@ -9,7 +9,7 @@ namespace GTServer {
     Player::Player(ENetPeer* peer) : 
         m_peer(peer),
         m_login_info{ std::make_shared<LoginInformation>() },
-        m_inventory{ std::make_shared<Inventory>(peer) },
+        m_inventory{ peer },
         v_sender{ peer },
         PacketSender{ peer },
         CharacterState{}
@@ -91,7 +91,6 @@ namespace GTServer {
         }
     }
 
-    
     void Player::send_character_state(std::shared_ptr<Player> player) {
         GameUpdatePacket packet{};
         packet.m_type = NET_GAME_PACKET_SET_CHARACTER_STATE;

@@ -91,7 +91,9 @@ namespace GTServer {
             }
             else if (pos.y > bedrock_layer)
                 tile.set_foreground(ITEM_BEDROCK);
-
+                
+            if (pos.x == maindoor_pos.x && pos.y == maindoor_pos.y + 1)
+                tile.set_foreground(ITEM_BEDROCK);
             if (pos.y > dirt_layer.x)
                 tile.set_background(ITEM_CAVE_BACKGROUND);
 
@@ -99,6 +101,11 @@ namespace GTServer {
         }
     }
 
+    Tile* World::get_tile(uint16_t x, uint16_t y) {
+        if (x < 0 || y < 0 || x > m_width || y > m_height)
+            return nullptr;
+        return &m_tiles[x + y * m_width];
+    }
     CL_Vec2i World::get_tile_pos(const uint16_t& id) const {
         for (int i = 0; i < m_tiles.size(); i++) {
             if (m_tiles[i].get_foreground() != id)

@@ -60,8 +60,8 @@ namespace GTServer::events {
         }
         
         ctx.m_player->set_raw_name(ctx.m_parser.get("requestedName", 1) + "_" + std::to_string(utils::random::get_generator_static().uniform(100, 999)));
-        ctx.m_player->m_inventory->add(ITEM_FIST, 1);
-        ctx.m_player->m_inventory->add(ITEM_WRENCH, 1);
+        ctx.m_player->m_inventory.add(ITEM_FIST, 1);
+        ctx.m_player->m_inventory.add(ITEM_WRENCH, 1);
 
         PlayerTable* db = (PlayerTable*)ctx.m_database->get_table(Database::DATABASE_PLAYER_TABLE);
         if (!db->load(ctx.m_player, true)) {

@@ -46,6 +46,13 @@ namespace GTServer {
                 message
             }, delay);
         }
+        void OnTalkBubble(const uint32_t& net_id, const std::string& message, uint32_t delay = 0) {
+            this->send_varlist({ 
+                "OnTalkBubble",
+                net_id,
+                message
+            }, delay);
+        }
         void OnRequestWorldSelectMenu(const std::string& data, int32_t delay = 0) {
             this->send_varlist({
                 "OnRequestWorldSelectMenu",

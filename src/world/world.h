@@ -21,6 +21,8 @@ namespace GTServer {
         [[nodiscard]] CL_Vec2i get_size() const { return CL_Vec2i{ m_width, m_height }; }
         void generate();
 
+        Tile* get_tile(uint16_t x, uint16_t y);
+        Tile* get_tile(CL_Vec2i vec2i) { return get_tile(vec2i.x, vec2i.y); }
         CL_Vec2i get_tile_pos(const uint16_t& id) const;
         CL_Vec2i get_tile_pos(const eItemTypes& type) const;
 

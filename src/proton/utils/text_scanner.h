@@ -149,6 +149,7 @@ namespace GTServer
             return string;
         }
 
+        std::vector<std::string> get_data() const { return m_data; }
         bool empty() { return m_data.empty(); }
         std::size_t size() { return m_data.size(); }
 

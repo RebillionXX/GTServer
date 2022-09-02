@@ -2,6 +2,8 @@
 #include <unordered_map>
 #include <player/objects/packet_sender.h>
 #include <database/item/item_database.h>
+#include <utils/binary_reader.h>
+#include <utils/binary_writer.h>
 
 namespace GTServer {
     enum eInventoryItemFlags {
@@ -34,16 +36,12 @@ namespace GTServer {
             return true;
         }
 
-        void send() {
+        std::vector<uint8_t> pack() const {
+            std::vector<uint8_t> ret{};
             std::size_t alloc{ 8 + (4 * m_items.size()) };
-            GameUpdatePacket* update_packet{ static_cast<GameUpdatePacket*>(std::malloc(sizeof(GameUpdatePacket) + alloc)) };
-            std::memset(update_packet, 0, alloc);
-
-            update_packet->m_type = NET_GAME_PACKET_SEND_INVENTORY_STATE;
-            update_packet->m_flags |= NET_GAME_PACKET_FLAGS_EXTENDED;
-            update_packet->m_data_size = static_cast<uint32_t>(alloc);
-
-            BinaryWriter buffer{ alloc };
+            ret.resize(alloc);
+            
+            BinaryWriter buffer{ ret.data() };
             buffer.write<uint8_t>(0x1); // inventory version??
             buffer.write<uint32_t>(m_size);
             buffer.write<uint16_t>(static_cast<uint16_t>(m_items.size()));
@@ -54,9 +52,33 @@ namespace GTServer {
                 buffer.write<uint8_t>(item.second);
                 buffer.write<uint8_t>(flags);
             }
-            std::memcpy(&update_packet->m_data, buffer.get(), alloc);
+            return ret;
+        }
+        void serialize(const std::vector<uint8_t>& data) {
+            BinaryReader br{ data };
+            br.skip(1); // inventory version??
+            m_size = br.read<uint32_t>();
+            const uint16_t& items{ br.read<uint16_t>() };
 
-            this->send_packet(NET_MESSAGE_GAME_PACKET, update_packet, sizeof(GameUpdatePacket) + alloc);
+            for (uint16_t i = 0; i < items; i++) {
+                const uint16_t item_id{ br.read<uint16_t>() };
+                const uint8_t count{ br.read<uint8_t>() };
+                br.skip(1); // flags irrelevant
+                m_items.insert_or_assign(item_id, count);
+            }
+        }
+
+        void send() {
+            auto data{ this->pack() };
+            GameUpdatePacket* update_packet{ static_cast<GameUpdatePacket*>(std::malloc(sizeof(GameUpdatePacket) + data.size())) };
+            std::memset(update_packet, 0, data.size());
+
+            update_packet->m_type = NET_GAME_PACKET_SEND_INVENTORY_STATE;
+            update_packet->m_flags |= NET_GAME_PACKET_FLAGS_EXTENDED;
+            update_packet->m_data_size = static_cast<uint32_t>(data.size());
+            std::memcpy(&update_packet->m_data, data.data(), data.size());
+
+            this->send_packet(NET_MESSAGE_GAME_PACKET, update_packet, sizeof(GameUpdatePacket) + data.size());
             std::free(update_packet);
         }
     private:

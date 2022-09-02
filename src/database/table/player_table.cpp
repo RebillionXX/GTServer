@@ -38,7 +38,8 @@ namespace GTServer {
             acc.display_name = player->get_display_name(),
             acc.relative_identifier = login->m_rid,
             acc.machine_address = login->m_mac,
-            acc.role = player->get_role() 
+            acc.role = player->get_role(),
+            acc.inventory = player->m_inventory.pack()
         ));
         return id;
     }
@@ -57,6 +58,7 @@ namespace GTServer {
                         player->set_user_id(static_cast<uint32_t>(row.id));
                         player->set_raw_name(row.raw_name);
                         player->set_role(row.role);
+                        player->m_inventory.serialize(row.inventory);
                         return true;
                     }
                 }

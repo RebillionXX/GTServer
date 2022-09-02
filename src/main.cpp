@@ -12,6 +12,7 @@
 #include <server/http.h>
 #include <server/server.h>
 #include <server/server_pool.h>
+#include <command/command_manager.h>
 
 using namespace GTServer;
 std::shared_ptr<Database> g_database;
@@ -43,6 +44,9 @@ int main() {
     else
         fmt::print(" - items.dat -> {} items loaded with hash {}\n", items.get_items().size(), items.get_hash());
         
+    CommandManager& commands{ CommandManager::get() };
+    commands.register_commands();
+
     g_events = std::make_shared<EventPool>();
     g_events->load_events();
 

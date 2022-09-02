@@ -4,12 +4,14 @@
 #include <utils/text.h>
 
 #include <event/tank_events/OnMovement.h>
+#include <event/tank_events/OnTileChangeRequest.h>
 
 #include <event/text_events/action.h>
 #include <event/text_events/requested_name.h>
 
 #include <event/text_events/action/dialog_return.h>
 #include <event/text_events/action/enter_game.h>
+#include <event/text_events/action/input.h>
 #include <event/text_events/action/join_request.h>
 #include <event/text_events/action/quit.h>
 #include <event/text_events/action/refresh_item_data.h>
@@ -29,12 +31,14 @@ namespace GTServer {
 
         reg_action("dialog_return", events::dialog_return);
         reg_action("enter_game", events::enter_game);
+        reg_action("input", events::input);
         reg_action("join_request", events::join_request);
         reg_action("quit", events::quit);
         reg_action("refresh_item_data", events::refresh_item_data);
         reg_action("refresh_player_tribute_data", events::refresh_player_tribute_data);
 
         reg_packet(NET_GAME_PACKET_STATE, events::OnMovement);
+        reg_packet(NET_GAME_PACKET_TILE_CHANGE_REQUEST, events::OnTileChangeRequest);
         
         fmt::print(" - registered events, {} genetric texts {} actions {} game packets\n",
             this->get_registered_event(EVENT_TYPE_GENERIC_TEXT),

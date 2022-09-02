@@ -1,5 +1,6 @@
 #include <server/server_pool.h>
 #include <fmt/chrono.h>
+#include <fmt/ranges.h>
 #include <enet/enet.h>
 #include <utils/packet.h>
 #include <utils/text.h>
@@ -118,7 +119,6 @@ namespace GTServer {
                             .m_parser = TextScanner{ str }, 
                             .m_update_packet = nullptr 
                         };
-
                         std::string event_data = str.substr(0, str.find('|'));
                         if (!m_events->execute(EVENT_TYPE_GENERIC_TEXT, event_data, ctx))
                             break;
