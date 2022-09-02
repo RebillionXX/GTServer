@@ -3,14 +3,15 @@
 #include <utils/text.h>
 
 namespace GTServer {
-    Database::Database() : m_connection(nullptr) {
-        fmt::print("Initializing Database\n");
-        sqlpp::mysql::global_library_init();
-    }
     Database::~Database() {
+        if (m_connection->is_valid())
+            delete m_connection;
+        delete m_player_table;
+        delete m_world_table;
     }
 
     bool Database::connect() {
+        sqlpp::mysql::global_library_init();
         auto config = std::make_shared<sqlpp::mysql::connection_config>();
         config->host = config::database::host;
         config->port = config::database::port;
@@ -22,6 +23,7 @@ namespace GTServer {
 
         try {
             m_connection = new sqlpp::mysql::connection{ config };
+            fmt::print("Initializing Database\n");
             fmt::print(" - connection configuration\n"
             "  | host: {}\n"
             "  | user: {}\n"
@@ -31,16 +33,15 @@ namespace GTServer {
             config->database);
 
             m_player_table = new PlayerTable(m_connection);
+            m_world_table = new WorldTable(m_connection);
         }
         catch (const sqlpp::exception &e) {
             return false;
         }
         return true;
     }
-    bool Database::is_player_exist(const std::string& name) {
-        return true;
-    }
-    std::pair<Database::RegistrationResult, std::string> Database::register_player(
+    
+    /*std::pair<Database::RegistrationResult, std::string> Database::register_player(
         const std::string& name, 
         const std::string& password, 
         const std::string& verify_password, 
@@ -86,12 +87,14 @@ namespace GTServer {
             };
         }
         return { RegistrationResult::SUCCESS, "" };
-    }
+    }*/
 
-    void* Database::get_table(const eDatabaseTable& table) {
+    void* Database::get_table__interface(const eDatabaseTable& table) {
         switch (table) {
             case DATABASE_PLAYER_TABLE:
                 return m_player_table;
+            case DATABASE_WORLD_TABLE:
+                return m_world_table;
             default:
                 return nullptr;
         }

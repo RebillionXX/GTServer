@@ -6,10 +6,9 @@
 
 namespace GTServer {
     class EventPool;
-    class Database;
     class ServerPool {
     public:
-        explicit ServerPool(std::shared_ptr<EventPool> events, std::shared_ptr<Database> database);
+        explicit ServerPool(std::shared_ptr<EventPool> events);
         ~ServerPool();
 
         bool initialize_enet();
@@ -31,7 +30,7 @@ namespace GTServer {
         [[nodiscard]] std::size_t get_active_servers() { return m_servers.size(); }
 
         std::shared_ptr<EventPool> get_events() const { return m_events; }
-        std::shared_ptr<Database> get_database() const { return m_database; }
+        
     private:
         std::string m_address{ "0.0.0.0" };
         uint16_t m_port{ 17091 };
@@ -40,9 +39,9 @@ namespace GTServer {
 
         std::atomic<bool> m_running{ false };
         std::thread m_service;
+        
     private:
         std::shared_ptr<EventPool> m_events;
-        std::shared_ptr<Database> m_database;
         std::vector<std::shared_ptr<Server>> m_servers{};
     };
 }

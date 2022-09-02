@@ -3,12 +3,10 @@
 #include <player/player.h>
 #include <server/server.h>
 #include <proton/packet.h>
-#include <database/item/item_database.h>
 
 namespace GTServer {
     class EventPool;
     class ServerPool;
-    class Database;
     enum EventType : uint8_t {
         EVENT_TYPE_GENERIC_TEXT,
         EVENT_TYPE_ACTION,
@@ -18,7 +16,6 @@ namespace GTServer {
     struct EventContext {
         std::shared_ptr<Player> m_player;
         std::shared_ptr<EventPool> m_events;
-        std::shared_ptr<Database> m_database;
         std::shared_ptr<Server> m_server;
         ServerPool* m_servers;
 

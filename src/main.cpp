@@ -15,12 +15,12 @@
 #include <command/command_manager.h>
 
 using namespace GTServer;
-std::shared_ptr<Database> g_database;
 std::shared_ptr<ServerPool> g_servers;
 std::shared_ptr<EventPool> g_events;
 
 int main() {
     fmt::print("starting {} V{}\n", SERVER_NAME, SERVER_VERSION);
+    fmt::print(" - {}\n", std::chrono::system_clock::now());
 #ifdef HTTP_SERVER
     auto http_server{ std::make_unique<HTTPServer>(
         std::string{ config::http::address.begin(), config::http::address.end() }, 
@@ -29,8 +29,9 @@ int main() {
     if (!http_server->listen())
         fmt::print("failed to starting http server, please run an external http service.\n");
 #endif
-    g_database = std::make_shared<Database>();
-    if (!g_database->connect())
+
+    Database& database{ Database::get() };
+    if (!database.connect())
         fmt::print(" - failed to connect MySQL server, please check server configuration.\n");
 
     PlayerTribute& player_tribute{ PlayerTribute::get() }  ;
@@ -50,7 +51,7 @@ int main() {
     g_events = std::make_shared<EventPool>();
     g_events->load_events();
 
-    g_servers = std::make_shared<ServerPool>(g_events, g_database);
+    g_servers = std::make_shared<ServerPool>(g_events);
     if (!g_servers->initialize_enet()) {
         fmt::print("failed to initialize enet, shutting down the server.\n");
         return EXIT_FAILURE;

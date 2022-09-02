@@ -5,8 +5,8 @@
 #include <sqlpp11/column_types.h>
 
 namespace GTServer {
-    namespace account_i {
-        struct id {
+    namespace player_i {
+        struct ID {
             struct _alias_t {
                 static constexpr const char _literal[] = "id";
                 using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
@@ -25,7 +25,6 @@ namespace GTServer {
 
             using _traits = ::sqlpp::make_traits<::sqlpp::integral, ::sqlpp::tag::must_not_insert, ::sqlpp::tag::must_not_update>;
         };
-
         struct RequestedName {
             struct _alias_t {
                 static constexpr const char _literal[] = "requsted_name";
@@ -45,7 +44,6 @@ namespace GTServer {
 
             using _traits = ::sqlpp::make_traits<::sqlpp::varchar, ::sqlpp::tag::must_not_update>;
         };
-
         struct TankIDName {
             struct _alias_t {
                 static constexpr const char _literal[] = "tank_id_name";
@@ -65,7 +63,6 @@ namespace GTServer {
 
             using _traits = ::sqlpp::make_traits<::sqlpp::varchar>;
         };
-
         struct TankIDPass {
             struct _alias_t {
                 static constexpr const char _literal[] = "tank_id_pass";
@@ -85,7 +82,6 @@ namespace GTServer {
 
             using _traits = ::sqlpp::make_traits<::sqlpp::varchar>;
         };
-
         struct RawName {
             struct _alias_t {
                 static constexpr const char _literal[] = "raw_name";
@@ -105,7 +101,6 @@ namespace GTServer {
 
             using _traits = ::sqlpp::make_traits<::sqlpp::varchar>;
         };
-        
         struct DisplayName {
             struct _alias_t {
                 static constexpr const char _literal[] = "display_name";
@@ -125,7 +120,6 @@ namespace GTServer {
 
             using _traits = ::sqlpp::make_traits<::sqlpp::varchar>;
         };
-        
         struct Email {
             struct _alias_t {
                 static constexpr const char _literal[] = "email";
@@ -145,7 +139,6 @@ namespace GTServer {
 
             using _traits = ::sqlpp::make_traits<::sqlpp::varchar>;
         };
-        
         struct Discord {
             struct _alias_t {
                 static constexpr const char _literal[] = "discord";
@@ -165,7 +158,6 @@ namespace GTServer {
 
             using _traits = ::sqlpp::make_traits<::sqlpp::varchar>;
         };
-        
         struct RelativeIdentifier {
             struct _alias_t {
                 static constexpr const char _literal[] = "relative_identifier";
@@ -184,8 +176,7 @@ namespace GTServer {
             };
 
             using _traits = ::sqlpp::make_traits<::sqlpp::varchar>;
-        };
-        
+        };     
         struct MachineAddress {
             struct _alias_t {
                 static constexpr const char _literal[] = "machine_address";
@@ -205,7 +196,6 @@ namespace GTServer {
 
             using _traits = ::sqlpp::make_traits<::sqlpp::varchar>;
         };
-
         struct Role {
             struct _alias_t {
                 static constexpr const char _literal[] = "role";
@@ -225,7 +215,6 @@ namespace GTServer {
 
             using _traits = ::sqlpp::make_traits<::sqlpp::integer>;
         };
-
         struct Inventory {
             struct _alias_t {
                 static constexpr const char _literal[] = "inventory";
@@ -247,31 +236,31 @@ namespace GTServer {
         };
     }
 
-    struct Account 
-    : sqlpp::table_t<Account, 
-        account_i::id, 
-        account_i::RequestedName, 
-        account_i::TankIDName, 
-        account_i::TankIDPass, 
-        account_i::RawName,
-        account_i::DisplayName, 
-        account_i::Email, 
-        account_i::Discord, 
-        account_i::RelativeIdentifier,
-        account_i::MachineAddress,
-        account_i::Role,
-        account_i::Inventory> {
+    struct PlayerDB 
+    : sqlpp::table_t<PlayerDB, 
+        player_i::ID, 
+        player_i::RequestedName, 
+        player_i::TankIDName, 
+        player_i::TankIDPass, 
+        player_i::RawName,
+        player_i::DisplayName, 
+        player_i::Email, 
+        player_i::Discord, 
+        player_i::RelativeIdentifier,
+        player_i::MachineAddress,
+        player_i::Role,
+        player_i::Inventory> {
         struct _alias_t {
             static constexpr const char _literal[] = "players";
             using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;
             template <typename T>
             struct _member_t {
-                T account;
+                T player_db;
                 T& operator()() {
-                    return account;
+                    return player_db;
                 }
                 const T& operator()() const {
-                    return account;
+                    return player_db;
                 }
             };
         };
