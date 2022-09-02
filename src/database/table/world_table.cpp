@@ -3,6 +3,6 @@
 
 namespace GTServer {
     bool WorldTable::is_exist(const std::string& name) {
-
+        return false;
     }
 }

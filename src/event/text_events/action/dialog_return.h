@@ -19,9 +19,9 @@ namespace GTServer::events {
                     email{ ctx.m_parser.get("email", 1) },
                     discord{ ctx.m_parser.get("discord", 1) }
                 ;
-                const std::pair<Database::RegistrationResult, std::string>& result = 
-                    ctx.m_database->register_player(name, password, verify_password, email, discord);
-                if (result.first != Database::RegistrationResult::SUCCESS) {
+                PlayerTable* db = (PlayerTable*)Database::get_table(Database::DATABASE_PLAYER_TABLE);
+                const auto& result{ db->register_player(name, password, verify_password, email, discord) };
+                if (result.first != PlayerTable::RegistrationResult::SUCCESS) {
                     ctx.m_player->send_dialog(Player::DIALOG_TYPE_REGISTRATION, TextScanner({ 
                         { "logon", name }, 
                         { "password", password },
@@ -32,7 +32,7 @@ namespace GTServer::events {
                     }));
                     break;
                 }
-                ctx.m_player->send_log("That feature isn't added yet");
+                ctx.m_player->send_log("That feature isn't implemented yet");
                 break;
             }
             default: {
