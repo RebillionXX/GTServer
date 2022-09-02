@@ -9,9 +9,8 @@
 #include <database/database.h>
 
 namespace GTServer {
-    ServerPool::ServerPool(std::shared_ptr<EventPool> events, std::shared_ptr<Database> database) :
-        m_events{ events },
-        m_database{ database } {
+    ServerPool::ServerPool(std::shared_ptr<EventPool> events) :
+        m_events{ events } {
         fmt::print("Initializing ServerPool\n");
     }
     ServerPool::~ServerPool() {
@@ -113,7 +112,6 @@ namespace GTServer {
                         EventContext ctx { 
                             .m_player = player,
                             .m_events = this->get_events(),
-                            .m_database = this->get_database(),
                             .m_server = server,
                             .m_servers = this,
                             .m_parser = TextScanner{ str }, 
@@ -131,7 +129,6 @@ namespace GTServer {
                         EventContext ctx { 
                             .m_player = player,
                             .m_events = this->get_events(),
-                            .m_database = this->get_database(),
                             .m_server = server,
                             .m_servers = this,
                             .m_parser = TextScanner{}, 

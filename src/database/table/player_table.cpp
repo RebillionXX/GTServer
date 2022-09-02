@@ -1,10 +1,10 @@
 #include <database/table/player_table.h>
-#include <database/interface/account_i.h>
+#include <database/interface/player_i.h>
 #include <utils/text.h>
 
 namespace GTServer {
     bool PlayerTable::is_guest_id_exist(const std::string& rid) const {
-        Account acc{};
+        PlayerDB acc{};
         for (const auto &row : (*m_connection)(select(all_of(acc)).from(acc).where(
             acc.relative_identifier == rid and acc.tank_id_name == std::string{}
         ))) {
@@ -14,7 +14,7 @@ namespace GTServer {
         return false;
     }
     bool PlayerTable::is_tank_id_exist(const std::string& name) const {
-        Account acc{};
+        PlayerDB acc{};
         for (const auto &row : (*m_connection)(select(all_of(acc)).from(acc).where(
             acc.raw_name == name and acc.tank_id_name != std::string{}
         ))) {
@@ -29,7 +29,7 @@ namespace GTServer {
 
         if (this->is_guest_id_exist(login->m_rid))
             return 0;
-        Account acc{};
+        PlayerDB acc{};
         auto id = (*m_connection)(insert_into(acc).set(
             acc.requsted_name = player->get_raw_name(),
             acc.tank_id_name = std::string{},
@@ -49,7 +49,7 @@ namespace GTServer {
     bool PlayerTable::load(std::shared_ptr<Player> player, const bool& guest) {
         try {
             if (guest) {
-                Account acc{};
+                PlayerDB acc{};
                 for (const auto &row : (*m_connection)(select(all_of(acc)).from(acc).where(
                     acc.relative_identifier == player->get_login_info()->m_rid &&
                     acc.tank_id_name == std::string{}
