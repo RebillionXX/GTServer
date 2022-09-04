@@ -11,7 +11,7 @@
  Target Server Version : 100424 (10.4.24-MariaDB)
  File Encoding         : 65001
 
- Date: 01/09/2022 14:01:23
+ Date: 04/09/2022 00:30:19
 */
 
 SET NAMES utf8mb4;
@@ -35,6 +35,21 @@ CREATE TABLE `players`  (
   `role` int NOT NULL DEFAULT 0,
   `inventory` blob NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for worlds
+-- ----------------------------
+DROP TABLE IF EXISTS `worlds`;
+CREATE TABLE `worlds`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `width` int NOT NULL,
+  `height` int NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `data` blob NOT NULL,
+  PRIMARY KEY (`id`, `name`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;
