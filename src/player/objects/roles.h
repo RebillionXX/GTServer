@@ -10,7 +10,7 @@ namespace GTServer {
         PLAYER_ROLE_MODERATOR,
         PLAYER_ROLE_ADMINISTRATOR,
         PLAYER_ROLE_MANAGER,
-        PLAYER_ROLE_DEVELOPER
+        PLAYER_ROLE_DEVELOPER FADILGM,
     };
 
     static std::unordered_map<int, char> role_color = {
